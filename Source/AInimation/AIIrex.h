@@ -6,6 +6,8 @@
 #include "AIrex.h"
 #include "StateMachine.h"
 #include "ACPath.h"
+#include "NavigationSystem.h"
+#include "PathPlanner.h"
 #include "AIIrex.generated.h"
 
 /**
@@ -24,8 +26,10 @@ class AINIMATION_API AAIIrex : public AAIController
 	// Utility
 	ACIrex* m_npcCharacter;
 	UAIrex* m_npcAnimInstance;
+	UNavigationSystemV1* m_pNavigationSystem;
 
-	// Path
+	// PathFinding
+	PathPlanner<AAIIrex>* m_pPathPlanner;
 	AACPath* m_path;
 
 public:

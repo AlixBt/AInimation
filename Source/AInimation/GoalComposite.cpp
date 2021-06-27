@@ -2,7 +2,7 @@
 
 template<class T>
 GoalComposite<T>::GoalComposite() : 
-	Goal<T>(1)
+	Goal<T>(T*, 1)
 {
 }
 
@@ -15,6 +15,8 @@ template<class T>
 void GoalComposite<T>::Activate()
 {
 	m_eStatus = EStatus::ES_Active;
+
+	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Activate() - Goal is active"));
 }
 
 template<class T>
@@ -22,6 +24,8 @@ int GoalComposite<T>::Process()
 {
 	if (m_eStatus != EStatus::ES_Active)
 		Activate();
+
+	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Process() - Goal is processing"));
 
 	return m_eStatus;
 }
@@ -36,6 +40,8 @@ template<class T>
 void GoalComposite<T>::AddSubgoal(Goal<T>* p_goal)
 {
 	m_aSubgoals.Insert(p_goal, 0);
+
+	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::AddSubgoals() - Goal has been added"));
 }
 
 template<class T>

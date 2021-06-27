@@ -23,15 +23,15 @@ protected:
 	int m_iType;
 
 public:
-	Goal();
-	Goal(int p_iType);
+	Goal(T* p_pOwner);
+	Goal(T* p_pOwner ,int p_iType);
 	~Goal();
 
 	// Pure virtual functions
-	virtual void Activate() { UE_LOG(LogTemp, Warning, TEXT("Goal::Activate() - Goal is active")); };
-	virtual int Process() { UE_LOG(LogTemp, Warning, TEXT("Goal::Process() - Goal is processing")); };
-	virtual void Terminate() { UE_LOG(LogTemp, Warning, TEXT("Goal::Terminate() - Goal is terminated")); };
-	virtual void AddSubgoal(Goal<T>* p_goal) { UE_LOG(LogTemp, Warning, TEXT("Goal::AddSubgoals() - Goal has been added")); };
+	virtual void Activate() = 0;
+	virtual int Process() = 0;
+	virtual void Terminate() = 0;
+	virtual void AddSubgoal(Goal<T>* p_goal) = 0;
 
 	// Getters
 	bool IsActive() const;

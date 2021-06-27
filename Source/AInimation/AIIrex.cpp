@@ -8,13 +8,16 @@ AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
 	m_npcCharacter(nullptr),
 	m_npcAnimInstance(nullptr),
 	m_path(nullptr),
-	m_bPreyIsFound(false)
+	m_bPreyIsFound(false),
+	m_pNavigationSystem(nullptr)
 {
-	// Finite state machine initialisation
+	// Initialization
 	m_pStateMachine = new StateMachine<AAIIrex>(this);
 
 	m_pStateMachine->SetCurrentState(WanderAndLookForPreyState::Instance());
 	m_pStateMachine->SetGlobalState(IrexGlobalState::Instance());
+
+	m_pPathPlanner = new PathPlanner<AAIIrex>(this);
 }
 
 void AAIIrex::BeginPlay()
@@ -29,6 +32,14 @@ void AAIIrex::BeginPlay()
 	{
 		m_path = Cast<AACPath>(OutActors[0]);
 		UE_LOG(LogTemp, Warning, TEXT("AAIIrex::BeginPlay - Path catch"));
+	}
+
+	// We catch the navigation system for the path planner
+	m_pNavigationSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+
+	if (m_pNavigationSystem)
+	{
+		m_pPathPlanner->InitializeNavMesh(m_pNavigationSystem);
 	}
 }
 

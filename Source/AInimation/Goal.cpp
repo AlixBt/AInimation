@@ -4,16 +4,16 @@
 #include "Goal.h"
 
 template<class T>
-Goal<T>::Goal():
-	m_pOwner(T*),
+Goal<T>::Goal(T* p_pOwner):
+	m_pOwner(p_pOwner),
 	m_eStatus(EStatus::ES_Inactive),
 	m_iType(-1)
 {
 }
 
 template<class T>
-Goal<T>::Goal(int p_iType) :
-	m_pOwner(T*),
+Goal<T>::Goal(T* p_pOwner, int p_iType) :
+	m_pOwner(p_pOwner),
 	m_eStatus(EStatus::ES_Inactive),
 	m_iType(p_iType)
 {
