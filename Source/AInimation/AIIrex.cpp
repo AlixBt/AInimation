@@ -2,6 +2,7 @@
 #include "IrexGlobalState.h"
 #include "WanderAndLookForPreyState.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 #include "Navigation/PathFollowingComponent.h"
 
 AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
@@ -67,6 +68,25 @@ void AAIIrex::Tick(float p_deltaTime)
 	if (m_npcCharacter && m_npcAnimInstance)
 	{
 		m_pStateMachine->Update();
+
+		TArray<FVector> outVerts;
+		int nodeID = m_pPathPlanner->GetClosestNodeToPosition(m_npcCharacter->GetActorLocation(), outVerts);
+
+		for (int i = 0; i < outVerts.Num(); i++)
+		{
+			if (i == outVerts.Num() - 1)
+			{
+				DrawDebugLine(GetWorld(), outVerts[i] + FVector(0.0f, 0.0f, 50.0f), outVerts[0] + FVector(0.0f, 0.0f, 50.0f), FColor::Red, false, -1.0f, 0, 10.0f);
+				UE_LOG(LogTemp, Warning, TEXT("Test"));
+			}
+			else
+			{
+				DrawDebugLine(GetWorld(), outVerts[i] + FVector(0.0f, 0.0f, 50.0f), outVerts[i + 1] + FVector(0.0f, 0.0f, 50.0f), FColor::Red, false, -1.0f, 0, 10.0f);
+			}
+		}
+
+		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Path result: %i"), nodeID));
+
 	}
 }
 
@@ -91,7 +111,5 @@ void AAIIrex::FollowPath()
 	{
 		m_path->IncrementPathIndex();
 	}
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Path result: %i"), pathIndex));
 	//UE_LOG(LogTemp, Warning, TEXT("AAIIrex::FollowPath - Path followed"));
 }
