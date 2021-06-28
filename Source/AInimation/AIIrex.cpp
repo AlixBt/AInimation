@@ -67,32 +67,22 @@ void AAIIrex::Tick(float p_deltaTime)
 	// Main tick loop
 	if (m_npcCharacter && m_npcAnimInstance)
 	{
-		m_pStateMachine->Update();
+		//m_pStateMachine->Update();
+		TArray<FVector> aPath;
+		bool bRaycast = m_pPathPlanner->CreatePathToPosition(GetWorld(), FVector(-1350.0f, 2700.0f, 0.0f), aPath);
 
-		TArray<FVector> outVerts;
-		int nodeID = m_pPathPlanner->GetClosestNodeToPosition(m_npcCharacter->GetActorLocation(), outVerts);
-
-		for (int i = 0; i < outVerts.Num(); i++)
-		{
-			if (i == outVerts.Num() - 1)
-			{
-				DrawDebugLine(GetWorld(), outVerts[i] + FVector(0.0f, 0.0f, 50.0f), outVerts[0] + FVector(0.0f, 0.0f, 50.0f), FColor::Red, false, -1.0f, 0, 10.0f);
-				UE_LOG(LogTemp, Warning, TEXT("Test"));
-			}
-			else
-			{
-				DrawDebugLine(GetWorld(), outVerts[i] + FVector(0.0f, 0.0f, 50.0f), outVerts[i + 1] + FVector(0.0f, 0.0f, 50.0f), FColor::Red, false, -1.0f, 0, 10.0f);
-			}
-		}
-
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Path result: %i"), nodeID));
-
+		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Raycast: %i"), bRaycast));
 	}
 }
 
 bool AAIIrex::GetPreyIsFound() const
 {
 	return m_bPreyIsFound;
+}
+
+ACIrex* AAIIrex::GetNPC() const
+{
+	return m_npcCharacter;
 }
 
 void AAIIrex::FollowPath()

@@ -43,6 +43,7 @@ public:
 
 	// Getters
 	bool GetPreyIsFound() const;
+	ACIrex* GetNPC() const;
 
 	// Pathfinding
 	void FollowPath();

@@ -4,6 +4,7 @@
 #include "NavMesh/RecastNavMesh.h"
 #include "NavigationSystem.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Engine/World.h"
 
 /**
@@ -13,6 +14,7 @@ template<class T>
 class AINIMATION_API PathPlanner
 {
 	T* m_pOwner;
+	UNavigationSystemV1* m_pNavigationSystem;
 	ARecastNavMesh* m_recastNavMesh;
 	FVector m_vDestinationToReach;
 
@@ -28,7 +30,8 @@ public:
 		// We get the navmesh, thank to the navigation system provided by the AI controller
 		if (p_pNavigationSystem)
 		{
-			m_recastNavMesh = Cast<ARecastNavMesh>(&p_pNavigationSystem->GetMainNavDataChecked());
+			m_pNavigationSystem = p_pNavigationSystem;
+			m_recastNavMesh = Cast<ARecastNavMesh>(&m_pNavigationSystem->GetMainNavDataChecked());
 		}
 
 		if (m_recastNavMesh)
@@ -37,32 +40,29 @@ public:
 		}
 	}
 
-	int GetClosestNodeToPosition(FVector p_vPosition, TArray<FVector>& p_outVerts) const
+	int GetClosestNodeToPosition(FVector p_vPosition) const
 	{
 		// We catch the closest node on the navmesh, to our position
 		NavNodeRef closestNode = m_recastNavMesh->FindNearestPoly(p_vPosition, FVector(50.0f, 50.0f, 50.0f));
 
 		if (closestNode != INVALID_NAVNODEREF)
 		{
-			TArray<FVector> outVerts;
-			m_recastNavMesh->GetPolyVerts(closestNode, p_outVerts);
-
-			/*for (int i = 0; i < outVerts.Num(); i++)
-			{
-				if (i == outVerts.Num() - 1)
-				{
-					DrawDebugLine(GEngine->GetWorld(), outVerts[i] + FVector(0.0f, 0.0f, 50.0f), outVerts[0] + FVector(0.0f, 0.0f, 50.0f), FColor::Red, false, 0.0f, 0, 10.0f);
-					UE_LOG(LogTemp, Warning, TEXT("Test"));
-				}
-				else
-				{
-					DrawDebugLine(GEngine->GetWorld(), outVerts[i] + FVector(0.0f, 0.0f, 50.0f), outVerts[i + 1] + FVector(0.0f, 0.0f, 50.0f), FColor::Red, false, 0.0f, 0, 10.0f);
-				}
-			}*/
-
 			return closestNode;
 		}
 
+		// Position outside of the navmesh
 		return -1;
+	}
+
+	bool CreatePathToPosition(UWorld* p_pWorld, FVector p_vTargetPosition, TArray<FVector>& p_aPath)
+	{
+		m_vDestinationToReach = p_vTargetPosition;
+		FVector vStartPosition = m_pOwner->GetNPC()->GetActorLocation();
+		FVector vHitLocation;
+
+		DrawDebugBox(p_pWorld, vStartPosition, FVector(100.0f, 100.0f, 100.0f), FColor::Green, false, -1.0f, 0, 5.0f);
+		DrawDebugBox(p_pWorld, p_vTargetPosition, FVector(100.0f, 100.0f, 100.0f), FColor::Red, false, -1.0f, 0, 5.0f);
+
+		return m_pNavigationSystem->NavigationRaycast(p_pWorld, vStartPosition + FVector(0.0f, 0.0f, 150.0f), p_vTargetPosition + FVector(0.0f, 0.0f, 150.0f), vHitLocation);
 	}
 };
