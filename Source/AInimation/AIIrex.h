@@ -29,7 +29,7 @@ class AINIMATION_API AAIIrex : public AAIController
 	UNavigationSystemV1* m_pNavigationSystem;
 
 	// PathFinding
-	PathPlanner<AAIIrex>* m_pPathPlanner;
+	PathPlanner* m_pPathPlanner;
 	AACPath* m_path;
 
 public:

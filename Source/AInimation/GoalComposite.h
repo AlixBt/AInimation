@@ -6,21 +6,20 @@
 /**
  * 
  */
-template<class T>
-class AINIMATION_API GoalComposite : public Goal<T>
+class AINIMATION_API GoalComposite : public Goal
 {
 	TArray<Goal*> m_aSubgoals;
 public:
-	GoalComposite();
+	GoalComposite(AAIIrex* p_pOwner);
 	~GoalComposite();
 
 	// Virtual functions override
-	void Activate() override;
-	int Process() override;
-	void Terminate() override;
-	void AddSubgoal(Goal<T>* p_goal) override;
+	virtual void Activate() override;
+	virtual int Process() override;
+	virtual void Terminate() override;
+	virtual void AddSubgoal(Goal* p_goal) override;
 
 	// Composite functions
-	EStatus ProcessSubgoals();
+	int ProcessSubgoals();
 	void RemoveAllSubgoals();
 };

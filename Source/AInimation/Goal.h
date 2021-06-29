@@ -8,30 +8,29 @@
 UENUM(BlueprintType)
 enum class EStatus : uint8
 {
-	ES_Active UMETA(DisplayName = "Active"),
-	ES_Inactive UMETA(DisplayName = "Inactive"),
-	ES_Completed UMETA(DisplayName = "Completed"),
-	ES_Failed UMETA(DisplayName = "Failed")
+	ES_Active = 0 UMETA(DisplayName = "Active"),
+	ES_Inactive = 1 UMETA(DisplayName = "Inactive"),
+	ES_Completed = 2 UMETA(DisplayName = "Completed"),
+	ES_Failed = 3 UMETA(DisplayName = "Failed")
 };
 
-template<class T>
 class AINIMATION_API Goal
 {
 protected:
-	T* m_pOwner;
+	class AAIIrex* m_pOwner;
 	EStatus m_eStatus;
 	int m_iType;
 
 public:
-	Goal(T* p_pOwner);
-	Goal(T* p_pOwner ,int p_iType);
+	Goal(AAIIrex* p_pOwner);
+	Goal(AAIIrex* p_pOwner ,int p_iType);
 	~Goal();
 
 	// Pure virtual functions
 	virtual void Activate() = 0;
 	virtual int Process() = 0;
 	virtual void Terminate() = 0;
-	virtual void AddSubgoal(Goal<T>* p_goal) = 0;
+	virtual void AddSubgoal(Goal* p_goal) = 0;
 
 	// Getters
 	bool IsActive() const;

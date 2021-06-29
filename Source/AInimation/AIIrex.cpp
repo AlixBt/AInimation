@@ -18,7 +18,7 @@ AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
 	m_pStateMachine->SetCurrentState(WanderAndLookForPreyState::Instance());
 	m_pStateMachine->SetGlobalState(IrexGlobalState::Instance());
 
-	m_pPathPlanner = new PathPlanner<AAIIrex>(this);
+	m_pPathPlanner = new PathPlanner(this);
 }
 
 void AAIIrex::BeginPlay()
@@ -69,9 +69,7 @@ void AAIIrex::Tick(float p_deltaTime)
 	{
 		//m_pStateMachine->Update();
 		TArray<FVector> aPath;
-		bool bRaycast = m_pPathPlanner->CreatePathToPosition(GetWorld(), FVector(-1350.0f, 2700.0f, 0.0f), aPath);
-
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::Red, FString::Printf(TEXT("Raycast: %i"), bRaycast));
+		bool bRaycast = m_pPathPlanner->CreatePathToPosition(FVector(-1350.0f, 2700.0f, 0.0f), aPath);
 	}
 }
 
@@ -101,5 +99,4 @@ void AAIIrex::FollowPath()
 	{
 		m_path->IncrementPathIndex();
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("AAIIrex::FollowPath - Path followed"));
 }

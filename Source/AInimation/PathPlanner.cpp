@@ -1,1 +1,66 @@
 #include "PathPlanner.h"
+#include "AIIrex.h"
+#include "NavMesh/RecastNavMesh.h"
+#include "DrawDebugHelpers.h"
+#include "AStar.h"
+
+PathPlanner::PathPlanner(AAIIrex* p_pOwner) :
+	m_pOwner(p_pOwner),
+	m_pRecastNavMesh(nullptr),
+	m_pNavigationSystem(nullptr),
+	m_vDestinationToReach(FVector(0.0f, 0.0f, 0.0f))
+{
+}
+
+PathPlanner::~PathPlanner()
+{
+}
+
+void PathPlanner::InitializeNavMesh(UNavigationSystemV1* p_pNavigationSystem)
+{
+	// We get the navmesh, thank to the navigation system provided by the AI controller
+	if (p_pNavigationSystem)
+	{
+		m_pNavigationSystem = p_pNavigationSystem;
+		m_pRecastNavMesh = Cast<ARecastNavMesh>(&m_pNavigationSystem->GetMainNavDataChecked());
+	}
+
+	if (m_pRecastNavMesh)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PathPlanner::InitializeNavMesh() - Recast nav mesh found"));
+	}
+}
+
+NavNodeRef PathPlanner::GetClosestNodeToPosition(FVector p_vPosition) const
+{
+	// We catch the closest node on the navmesh, to our position
+	NavNodeRef closestNode = m_pRecastNavMesh->FindNearestPoly(p_vPosition, FVector(50.0f, 50.0f, 50.0f));
+
+	if (closestNode != INVALID_NAVNODEREF)
+	{
+		return closestNode;
+	}
+
+	// Position outside of the navmesh
+	return -1;
+}
+
+bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector>& p_aPath)
+{
+	m_vDestinationToReach = p_vTargetPosition;
+
+	// If the node near the NPC or the target is outside the navmesh, return false
+	NavNodeRef closestNodeToNPC = GetClosestNodeToPosition(m_pOwner->GetNPC()->GetActorLocation());
+	NavNodeRef closestNodeToTarget = GetClosestNodeToPosition(p_vTargetPosition);
+
+	if (closestNodeToNPC == -1 || closestNodeToTarget == -1)
+	{
+		return false;
+	}
+
+	AStar* pAStar = new AStar(m_pRecastNavMesh);
+	pAStar->SearchShortestPathOfNodes(m_pOwner->GetWorld(), closestNodeToNPC, closestNodeToTarget);
+	//GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("Heuristic cost: %f"), fCost));
+
+	return false;
+}

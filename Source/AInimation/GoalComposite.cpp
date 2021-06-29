@@ -1,77 +1,69 @@
 #include "GoalComposite.h"
 
-template<class T>
-GoalComposite<T>::GoalComposite() : 
-	Goal<T>(T*, 1)
+GoalComposite::GoalComposite(AAIIrex* p_pOwner) :
+	Goal( p_pOwner, 1)
 {
 }
 
-template<class T>
-GoalComposite<T>::~GoalComposite()
+GoalComposite::~GoalComposite()
 {
 }
 
-template<class T>
-void GoalComposite<T>::Activate()
+void GoalComposite::Activate()
 {
 	m_eStatus = EStatus::ES_Active;
 
 	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Activate() - Goal is active"));
 }
 
-template<class T>
-int GoalComposite<T>::Process()
+int GoalComposite::Process()
 {
 	if (m_eStatus != EStatus::ES_Active)
 		Activate();
 
 	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Process() - Goal is processing"));
 
-	return m_eStatus;
+	return (int)m_eStatus;
 }
 
-template<class T>
-void GoalComposite<T>::Terminate()
+void GoalComposite::Terminate()
 {
 	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Terminate() - Goal is terminated"));
 }
 
-template<class T>
-void GoalComposite<T>::AddSubgoal(Goal<T>* p_goal)
+void GoalComposite::AddSubgoal(Goal* p_goal)
 {
 	m_aSubgoals.Insert(p_goal, 0);
 
 	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::AddSubgoals() - Goal has been added"));
 }
 
-template<class T>
-EStatus GoalComposite<T>::ProcessSubgoals()
+int GoalComposite::ProcessSubgoals()
 {
-	while (m_aSubgoal.Num() > 0 && m_aSubgoal[0]->IsCompleted() || m_aSubgoal[0]->HasFailed())
+	while (m_aSubgoals.Num() > 0 && m_aSubgoals[0]->IsCompleted() || m_aSubgoals[0]->HasFailed())
 	{
 		m_aSubgoals[0]->Terminate();
 		m_aSubgoals.RemoveAt(0, 1, true);
 	}
 
-	if (m_aSubgoal.Num() > 0)
+	if (m_aSubgoals.Num() > 0)
 	{
-		int subgoalsStatus = m_aSubgoals[0]->Process();
+		uint8 subgoalsStatus = m_aSubgoals[0]->Process();
 
-		if (subgoals == EStatus::ES_Completed && m_aSubgoals.Num() > 1)
+		if (subgoalsStatus == (int)EStatus::ES_Completed && m_aSubgoals.Num() > 1)
 		{
-			return EStatus::ES_Active;
+			return (int)EStatus::ES_Active;
 		}
 
 		return subgoalsStatus;
 	}
 	else
 	{
-		return EStatus::ES_Completed;
+		return (int)EStatus::ES_Completed;
 	}
 }
 
-template<class T>
-void GoalComposite<T>::RemoveAllSubgoals()
+void GoalComposite::RemoveAllSubgoals()
 {
 	for (int i = 0; i < m_aSubgoals.Num(); i++)
 	{
