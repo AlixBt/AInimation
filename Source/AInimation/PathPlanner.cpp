@@ -2,7 +2,7 @@
 #include "AIIrex.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "DrawDebugHelpers.h"
-#include "AStar.h"
+#include "PathFinder.h"
 
 PathPlanner::PathPlanner(AAIIrex* p_pOwner) :
 	m_pOwner(p_pOwner),
@@ -58,8 +58,8 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector
 		return false;
 	}
 
-	AStar* pAStar = new AStar(m_pRecastNavMesh);
-	pAStar->SearchShortestPathOfNodes(m_pOwner->GetWorld(), closestNodeToNPC, closestNodeToTarget);
+	PathFinder* pPathFinder = new PathFinder(m_pRecastNavMesh);
+	pPathFinder->AStar(m_pOwner->GetWorld(), closestNodeToNPC, closestNodeToTarget);
 	//GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("Heuristic cost: %f"), fCost));
 
 	return false;
