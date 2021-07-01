@@ -139,32 +139,81 @@ TArray<Node> PathFinder::GetNodeNeighbours(NavNodeRef p_nodeRef) const
 TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const
 {
 	TArray<FNavigationPortalEdge> aPathPortals = FindPortalsFromPath(p_aPathNodes);
+	TArray<FVector> aReturnPath;
 
 	if (!aPathPortals.IsEmpty())
 	{
-		TArray<FVector> aReturnPath;
-		aReturnPath.Add(p_vStartPosition);
-
 		FVector vApexPortal = p_vStartPosition;
-		FVector vRightPortal = aPathPortals[1].Right;
+		FVector vRightPortal = aPathPortals[0].Right;
 		FVector vLeftPortal = aPathPortals[0].Left;
 
-		FVector testRight = (p_vStartPosition - vRightPortal).GetSafeNormal();
-		FVector testLeft = (p_vStartPosition - vLeftPortal).GetSafeNormal();
-		FVector fAngle = FVector::CrossProduct(testRight, testLeft);
+		int iApexIndex = 0;
+		bool bUpdateIndex = false;
 
-
-		for (int i = 1; i < aPathPortals.Num(); i++)
+		for (int i = 1; i < aPathPortals.Num(); ++i)
 		{
-			FVector vNextRight = aPathPortals[i].Right;
-			FVector vNextLeft = aPathPortals[i].Left;
+			if (bUpdateIndex)
+			{
+				i = iApexIndex;
+				bUpdateIndex = false;
+			}
 
-			DrawDebugLine(p_pWorld, aPathPortals[i].Left + FVector(0.0f, 0.0f, 100.0f), aPathPortals[i].Right + FVector(0.0f, 0.0f, 100.0f), FColor::Purple, false, -1.0f, 0, 10.0f);
+			UE_LOG(LogTemp, Warning, TEXT("Index: %i"), i);
+			const FVector vRight = aPathPortals[i].Right;
+			const FVector vLeft = aPathPortals[i].Left;
+
+			if (Triarea2(vApexPortal, vRightPortal, vRight) <= 0.0f)
+			{
+				if (Triarea2(vApexPortal, vLeftPortal, vRight) > 0.0f)
+				{
+					vRightPortal = vRight;
+					UE_LOG(LogTemp, Warning, TEXT("Right updated"));
+				}
+				else
+				{
+					vApexPortal = vLeftPortal;
+
+					aReturnPath.Add(vApexPortal);
+					UE_LOG(LogTemp, Warning, TEXT("Left new portal"));
+
+					iApexIndex = i;
+					bUpdateIndex = true;
+					continue;
+				}
+			}
+
+			if (Triarea2(vApexPortal, vLeftPortal, vLeft) >= 0.0f)
+			{
+				if (Triarea2(vApexPortal, vRightPortal, vLeft) < 0.0f)
+				{
+					vLeftPortal = vLeft;
+					UE_LOG(LogTemp, Warning, TEXT("Left updated"));
+				}
+				else
+				{
+					vApexPortal = vRightPortal;
+
+					aReturnPath.Add(vApexPortal);
+					UE_LOG(LogTemp, Warning, TEXT("Left new portal"));
+
+					iApexIndex = i;
+					bUpdateIndex = true;
+					continue;
+				}
+			}
 		}
-		GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("CrossProduct cost: %s"), *fAngle.ToString()));
+
+		
+		
+		aReturnPath.Add(p_vTargetPosition);
+		UE_LOG(LogTemp, Warning, TEXT("Last point added"));
+		
+
+
+		//GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("CrossProduct cost: %f"), fCost));
 	}
 
-	return TArray<FVector>();
+	return aReturnPath;
 }
 
 TArray<FNavigationPortalEdge> PathFinder::FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const
@@ -190,4 +239,14 @@ TArray<FNavigationPortalEdge> PathFinder::FindPortalsFromPath(TArray<NavNodeRef>
 		return aReturnPathPortals;
 
 	return TArray<FNavigationPortalEdge>();
+}
+
+float PathFinder::Triarea2(FVector p_vApex, FVector p_vCurrentVector, FVector p_vCandidateVector) const
+{
+	const float fAx = p_vCurrentVector[0] - p_vApex[0];
+	const float fAy = p_vCurrentVector[1] - p_vApex[1];
+	const float fBx = p_vCandidateVector[0] - p_vApex[0];
+	const float fBy = p_vCandidateVector[1] - p_vApex[1];
+
+	return fBx * fAy - fAx * fBy;
 }

@@ -65,7 +65,15 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector
 	
 	if (!aPathNodes.IsEmpty())
 	{
-		pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
+		TArray<FVector> aPathVectors = pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
+		
+		if (!aPathVectors.IsEmpty())
+		{
+			for (int i = 0; i < aPathVectors.Num(); i++)
+			{
+				DrawDebugBox(m_pOwner->GetWorld(), aPathVectors[i], FVector(50.0f, 50.0f, 50.0f), FColor::Purple, false, -1.0f, 0, 5.0f);
+			}
+		}
 	}
 
 	//GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("Heuristic cost: %f"), fCost));
