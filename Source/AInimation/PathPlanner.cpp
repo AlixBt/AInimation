@@ -50,16 +50,24 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector
 	m_vDestinationToReach = p_vTargetPosition;
 
 	// If the node near the NPC or the target is outside the navmesh, return false
-	NavNodeRef closestNodeToNPC = GetClosestNodeToPosition(m_pOwner->GetNPC()->GetActorLocation());
+	FVector vStartPosition = m_pOwner->GetNPC()->GetActorLocation();
+	NavNodeRef closestNodeToNPC = GetClosestNodeToPosition(vStartPosition);
 	NavNodeRef closestNodeToTarget = GetClosestNodeToPosition(p_vTargetPosition);
 
 	if (closestNodeToNPC == -1 || closestNodeToTarget == -1)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Path false"));
 		return false;
 	}
 
 	PathFinder* pPathFinder = new PathFinder(m_pRecastNavMesh);
-	pPathFinder->AStar(m_pOwner->GetWorld(), closestNodeToNPC, closestNodeToTarget);
+	TArray<NavNodeRef> aPathNodes = pPathFinder->AStar(m_pOwner->GetWorld(), closestNodeToNPC, closestNodeToTarget);
+	
+	if (!aPathNodes.IsEmpty())
+	{
+		pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
+	}
+
 	//GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("Heuristic cost: %f"), fCost));
 
 	return false;

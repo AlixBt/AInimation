@@ -69,7 +69,7 @@ void AAIIrex::Tick(float p_deltaTime)
 	{
 		//m_pStateMachine->Update();
 		TArray<FVector> aPath;
-		bool bRaycast = m_pPathPlanner->CreatePathToPosition(FVector(-1350.0f, 2700.0f, 0.0f), aPath);
+		m_pPathPlanner->CreatePathToPosition(FVector(-2450.0f, 2200.0f, 0.0f), aPath);
 	}
 }
 

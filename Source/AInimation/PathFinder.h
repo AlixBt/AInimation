@@ -20,8 +20,10 @@ public:
 	~PathFinder();
 
 	float CalculateHeuristic(NavNodeRef p_sourceNode, NavNodeRef p_targetNode) const;
-	void AStar(UWorld* p_pWorld, NavNodeRef p_startNode, NavNodeRef p_targetNode);
+	TArray<NavNodeRef> AStar(UWorld* p_pWorld, NavNodeRef p_startNode, NavNodeRef p_targetNode);
 	TArray<NavNodeRef> RetracePath(Node p_startNode, Node p_targetNode, TArray<Node> p_aClosedList) const;
 	TArray<Node> GetNodeNeighbours(NavNodeRef p_nodeRef) const;
 
+	TArray<FVector> FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const;
+	TArray<FNavigationPortalEdge> FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const;
 };

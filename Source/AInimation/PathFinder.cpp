@@ -1,6 +1,7 @@
 #include "PathFinder.h"
 #include "DrawDebugHelpers.h"
 #include "Algo/Reverse.h"
+#include "Kismet/KismetMathLibrary.h"
 
 Node PathFinder::GetLowestFCostNode(TArray<Node> p_aOpenList) const
 {
@@ -42,7 +43,7 @@ float PathFinder::CalculateHeuristic(NavNodeRef p_sourceNode, NavNodeRef p_targe
 	return vDistanceFromSourceToTarget.Size();
 }
 
-void PathFinder::AStar(UWorld* p_pWorld, NavNodeRef p_startNode, NavNodeRef p_targetNode)
+TArray<NavNodeRef> PathFinder::AStar(UWorld* p_pWorld, NavNodeRef p_startNode, NavNodeRef p_targetNode)
 {
 	TArray<Node> aOpenList;
 	TArray<Node> aClosedList;
@@ -65,15 +66,7 @@ void PathFinder::AStar(UWorld* p_pWorld, NavNodeRef p_startNode, NavNodeRef p_ta
 		if (currentNode == targetNode)
 		{
 			TArray<NavNodeRef> aPath = RetracePath(startNode, currentNode, aClosedList);
-
-			for (int i = 0; i < aPath.Num(); i++)
-			{
-				FVector vCenterPosition;
-				m_pRecastNavMesh->GetPolyCenter(aPath[i], vCenterPosition);
-				DrawDebugBox(p_pWorld, vCenterPosition, FVector(50.0f, 50.0f, 50.0f), FColor::Purple, false, -1.0f, 0, 5.0f);
-			}
-
-			return;
+			return aPath;
 		}
 
 		// We get all the neighbours to the current node
@@ -97,6 +90,8 @@ void PathFinder::AStar(UWorld* p_pWorld, NavNodeRef p_startNode, NavNodeRef p_ta
 			}
 		}
 	}
+
+	return TArray<NavNodeRef>();
 }
 
 TArray<NavNodeRef> PathFinder::RetracePath(Node p_startNode, Node p_targetNode, TArray<Node> p_aClosedList) const
@@ -117,7 +112,9 @@ TArray<NavNodeRef> PathFinder::RetracePath(Node p_startNode, Node p_targetNode, 
 		}
 	}
 
+	aReturnPath.Add(p_startNode.GetNodeRef());
 	Algo::Reverse(aReturnPath);
+
 	return aReturnPath;
 }
 
@@ -137,4 +134,60 @@ TArray<Node> PathFinder::GetNodeNeighbours(NavNodeRef p_nodeRef) const
 		return aOutNode;
 	}
 	return TArray<Node>();
+}
+
+TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const
+{
+	TArray<FNavigationPortalEdge> aPathPortals = FindPortalsFromPath(p_aPathNodes);
+
+	if (!aPathPortals.IsEmpty())
+	{
+		TArray<FVector> aReturnPath;
+		aReturnPath.Add(p_vStartPosition);
+
+		FVector vApexPortal = p_vStartPosition;
+		FVector vRightPortal = aPathPortals[1].Right;
+		FVector vLeftPortal = aPathPortals[0].Left;
+
+		FVector testRight = (p_vStartPosition - vRightPortal).GetSafeNormal();
+		FVector testLeft = (p_vStartPosition - vLeftPortal).GetSafeNormal();
+		FVector fAngle = FVector::CrossProduct(testRight, testLeft);
+
+
+		for (int i = 1; i < aPathPortals.Num(); i++)
+		{
+			FVector vNextRight = aPathPortals[i].Right;
+			FVector vNextLeft = aPathPortals[i].Left;
+
+			DrawDebugLine(p_pWorld, aPathPortals[i].Left + FVector(0.0f, 0.0f, 100.0f), aPathPortals[i].Right + FVector(0.0f, 0.0f, 100.0f), FColor::Purple, false, -1.0f, 0, 10.0f);
+		}
+		GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("CrossProduct cost: %s"), *fAngle.ToString()));
+	}
+
+	return TArray<FVector>();
+}
+
+TArray<FNavigationPortalEdge> PathFinder::FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const
+{
+	TArray<FNavigationPortalEdge> aReturnPathPortals;
+	TArray<FNavigationPortalEdge> aNeighboursNodePortals;
+
+	for (int i = 0; i < p_aPathNodes.Num() - 1; i++)
+	{
+		m_pRecastNavMesh->GetPolyNeighbors(p_aPathNodes[i],	aNeighboursNodePortals);
+
+		for (int j = 0; j < aNeighboursNodePortals.Num(); j++)
+		{
+			if (aNeighboursNodePortals[j].ToRef == p_aPathNodes[i + 1])
+			{
+				aReturnPathPortals.Add(aNeighboursNodePortals[j]);
+				break;
+			}
+		}
+	}
+
+	if (!aReturnPathPortals.IsEmpty())
+		return aReturnPathPortals;
+
+	return TArray<FNavigationPortalEdge>();
 }
