@@ -27,4 +27,5 @@ public:
 	TArray<FVector> FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const;
 	TArray<FNavigationPortalEdge> FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const;
 	float Triarea2(FVector p_vApex, FVector p_vCurrentVector, FVector p_vCandidateVector) const;
+	bool EqualDistance(FVector p_vCurrent, FVector p_vToCheck) const;
 };

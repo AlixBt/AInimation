@@ -69,9 +69,9 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector
 		
 		if (!aPathVectors.IsEmpty())
 		{
-			for (int i = 0; i < aPathVectors.Num(); i++)
+			for (int i = 0; i < aPathVectors.Num() - 1; i++)
 			{
-				DrawDebugBox(m_pOwner->GetWorld(), aPathVectors[i], FVector(50.0f, 50.0f, 50.0f), FColor::Purple, false, -1.0f, 0, 5.0f);
+				DrawDebugLine(m_pOwner->GetWorld(), aPathVectors[i], aPathVectors[i + 1], FColor::Purple, false, -1.0f, 0, 5.0f);
 			}
 		}
 	}
