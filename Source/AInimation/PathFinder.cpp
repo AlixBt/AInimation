@@ -155,31 +155,22 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 
 		for (int i = 1; i < aPathPortals.Num(); ++i)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Index: %i"), i);
 			const FVector vRight = aPathPortals[i].Right;
 			const FVector vLeft = aPathPortals[i].Left;
 
 			if (Triarea2(vApexPortal, vRightPortal, vRight) <= 0.0f)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Triare2: %f"), Triarea2(vApexPortal, vRightPortal, vRight));
-
 				if (EqualDistance(vApexPortal, vRightPortal) || Triarea2(vApexPortal, vLeftPortal, vRight) > 0.0f)
 				{
 					vRightPortal = vRight;
 					iRightIndex = i;
-					UE_LOG(LogTemp, Error, TEXT("Bool distance: %s"), (EqualDistance(vApexPortal, vRightPortal) ? TEXT("true") : TEXT("false")));
-					UE_LOG(LogTemp, Error, TEXT("Triare2: %f"), Triarea2(vApexPortal, vLeftPortal, vRight));
-					UE_LOG(LogTemp, Warning, TEXT("Right updated"));
 				}
 				else
 				{
-					UE_LOG(LogTemp, Error, TEXT("Bool distance: %s"), (EqualDistance(vApexPortal, vRightPortal) ? TEXT("true") : TEXT("false")));
-					UE_LOG(LogTemp, Error, TEXT("Triare2: %f"), Triarea2(vApexPortal, vLeftPortal, vRight));
-
+					ShiftPath(p_pWorld, vLeftPortal, vApexPortal, vRight);
 					vApexPortal = vLeftPortal;
 					iApexIndex = iLeftIndex;
 					aReturnPath.Add(vApexPortal);
-					UE_LOG(LogTemp, Warning, TEXT("Left new portal"));
 
 					vLeftPortal = vApexPortal;
 					vRightPortal = vApexPortal;
@@ -193,25 +184,17 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 
 			if (Triarea2(vApexPortal, vLeftPortal, vLeft) >= 0.0f)
 			{
-				UE_LOG(LogTemp, Error, TEXT("Triare2: %f"), Triarea2(vApexPortal, vLeftPortal, vLeft));
-
 				if (EqualDistance(vApexPortal, vLeftPortal) || Triarea2(vApexPortal, vRightPortal, vLeft) < 0.0f)
 				{
 					vLeftPortal = vLeft;
 					iLeftIndex = i;
-					UE_LOG(LogTemp, Error, TEXT("Bool distance: %s"), (EqualDistance(vApexPortal, vLeftPortal) ? TEXT("true") : TEXT("false")));
-					UE_LOG(LogTemp, Error, TEXT("Triare2: %f"), Triarea2(vApexPortal, vRightPortal, vLeft));
-					UE_LOG(LogTemp, Warning, TEXT("Left updated"));
 				}
 				else
 				{
-					UE_LOG(LogTemp, Error, TEXT("Bool distance: %s"), (EqualDistance(vApexPortal, vLeftPortal) ? TEXT("true") : TEXT("false")));
-					UE_LOG(LogTemp, Error, TEXT("Triare2: %f"), Triarea2(vApexPortal, vRightPortal, vLeft));
-
+					ShiftPath(p_pWorld, vRightPortal, vApexPortal, vLeft);
 					vApexPortal = vRightPortal;
 					iApexIndex = iRightIndex;
 					aReturnPath.Add(vApexPortal);
-					UE_LOG(LogTemp, Warning, TEXT("Right new portal"));
 
 					vLeftPortal = vApexPortal;
 					vRightPortal = vApexPortal;
@@ -284,4 +267,43 @@ bool PathFinder::EqualDistance(FVector p_vCurrent, FVector p_vToCheck) const
 {
 	const float fConstant = 0.001f * 0.001f;
 	return FVector(p_vToCheck - p_vCurrent).Size() < fConstant;
+}
+
+void PathFinder::ShiftPath(UWorld* p_pWorld, FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const
+{
+	FVector vOutDistance;
+	float fDistance = m_pRecastNavMesh->FindDistanceToWall(p_vPointToAdd, nullptr, 100.0f, &vOutDistance);
+
+	if (fDistance == 0.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("fDistance == 0"));
+		FVector vHorizontalVector = (p_vPointChecked - p_vApexPoint);
+		UE_LOG(LogTemp, Warning, TEXT("Vector: %s"), *vHorizontalVector.ToString());
+		
+
+		FVector vOrthogonalVector = FVector(1.0f, -vHorizontalVector.X / vHorizontalVector.Y, 0.0f);
+
+		UE_LOG(LogTemp, Warning, TEXT("DotProduct: %f"), FVector::DotProduct(vHorizontalVector, vOrthogonalVector));
+		if (FVector::DotProduct(vHorizontalVector, vOrthogonalVector) == 0.0f)
+		{
+			FVector vPointToTest = p_vPointToAdd + (vOrthogonalVector.GetSafeNormal() * 300.0f);
+			FNavLocation OutLocation;
+			FVector vExtent = FVector::ZeroVector;
+
+			bool bProjectPoint = m_pRecastNavMesh->ProjectPoint(vPointToTest, OutLocation, vExtent);
+
+			if (!OutLocation.HasNodeRef())
+				UE_LOG(LogTemp, Warning, TEXT("No node !"));
+
+			UE_LOG(LogTemp, Warning, TEXT("Project point: %s"), m_pRecastNavMesh->ProjectPoint(vPointToTest, OutLocation, vExtent) ? TEXT("true") : TEXT("false"));
+			if (bProjectPoint)
+			{
+				p_vPointToAdd = vPointToTest;
+			}
+			else
+			{
+				p_vPointToAdd = p_vPointToAdd + (-vOrthogonalVector.GetSafeNormal() * 300.0f);
+			}
+		}
+	}
 }
