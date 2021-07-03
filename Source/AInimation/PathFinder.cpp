@@ -167,7 +167,7 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 				}
 				else
 				{
-					ShiftPath(p_pWorld, vLeftPortal, vApexPortal, vRight);
+					ShiftPathPoint(vLeftPortal, vApexPortal, vRight);
 					vApexPortal = vLeftPortal;
 					iApexIndex = iLeftIndex;
 					aReturnPath.Add(vApexPortal);
@@ -191,7 +191,7 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 				}
 				else
 				{
-					ShiftPath(p_pWorld, vRightPortal, vApexPortal, vLeft);
+					ShiftPathPoint(vRightPortal, vApexPortal, vLeft);
 					vApexPortal = vRightPortal;
 					iApexIndex = iRightIndex;
 					aReturnPath.Add(vApexPortal);
@@ -220,6 +220,11 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 		/*DrawDebugLine(p_pWorld, vApexPortal, aPathPortals[0].Right, FColor::Green);
 		DrawDebugLine(p_pWorld, vApexPortal, aPathPortals[1].Right, FColor::Red);
 		GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("CrossProduct cost: %f"), Triarea2(vApexPortal, aPathPortals[0].Right, aPathPortals[1].Right)));*/
+	}
+
+	if (!aReturnPath.IsEmpty())
+	{
+		SmoothPath(aReturnPath);
 	}
 
 	return aReturnPath;
@@ -269,41 +274,51 @@ bool PathFinder::EqualDistance(FVector p_vCurrent, FVector p_vToCheck) const
 	return FVector(p_vToCheck - p_vCurrent).Size() < fConstant;
 }
 
-void PathFinder::ShiftPath(UWorld* p_pWorld, FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const
+void PathFinder::ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const
 {
 	FVector vOutDistance;
 	float fDistance = m_pRecastNavMesh->FindDistanceToWall(p_vPointToAdd, nullptr, 100.0f, &vOutDistance);
 
 	if (fDistance == 0.0f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("fDistance == 0"));
 		FVector vHorizontalVector = (p_vPointChecked - p_vApexPoint);
-		UE_LOG(LogTemp, Warning, TEXT("Vector: %s"), *vHorizontalVector.ToString());
-		
-
 		FVector vOrthogonalVector = FVector(1.0f, -vHorizontalVector.X / vHorizontalVector.Y, 0.0f);
 
-		UE_LOG(LogTemp, Warning, TEXT("DotProduct: %f"), FVector::DotProduct(vHorizontalVector, vOrthogonalVector));
 		if (FVector::DotProduct(vHorizontalVector, vOrthogonalVector) == 0.0f)
 		{
-			FVector vPointToTest = p_vPointToAdd + (vOrthogonalVector.GetSafeNormal() * 300.0f);
+			FVector vPointToTest = p_vPointToAdd + (vOrthogonalVector.GetSafeNormal() * 200.0f);
 			FNavLocation OutLocation;
 			FVector vExtent = FVector::ZeroVector;
 
 			bool bProjectPoint = m_pRecastNavMesh->ProjectPoint(vPointToTest, OutLocation, vExtent);
 
-			if (!OutLocation.HasNodeRef())
-				UE_LOG(LogTemp, Warning, TEXT("No node !"));
-
-			UE_LOG(LogTemp, Warning, TEXT("Project point: %s"), m_pRecastNavMesh->ProjectPoint(vPointToTest, OutLocation, vExtent) ? TEXT("true") : TEXT("false"));
 			if (bProjectPoint)
 			{
 				p_vPointToAdd = vPointToTest;
 			}
 			else
 			{
-				p_vPointToAdd = p_vPointToAdd + (-vOrthogonalVector.GetSafeNormal() * 300.0f);
+				p_vPointToAdd = p_vPointToAdd + (-vOrthogonalVector.GetSafeNormal() * 200.0f);
 			}
 		}
+	}
+}
+
+void PathFinder::SmoothPath(TArray<FVector>& p_aRoughPath) const
+{
+	for (int i = 0; i < p_aRoughPath.Num() - 2; i++)
+	{
+		if (i + 2 == p_aRoughPath.Num() - 1)
+			break;
+
+		FVector vSegmentStart = p_aRoughPath[i];
+		FVector vPotentialDelete = p_aRoughPath[i + 1];
+		FVector vSegmentEnd = p_aRoughPath[i + 2];
+
+		bool bIsSegmentOnNavmesh = m_pRecastNavMesh->IsSegmentOnNavmesh(vSegmentStart, vSegmentEnd);
+
+		if (bIsSegmentOnNavmesh)
+			p_aRoughPath.Remove(vPotentialDelete);
+		UE_LOG(LogTemp, Warning, TEXT("Is on navmesh: %s"), bIsSegmentOnNavmesh ? TEXT("true") : TEXT("false"));
 	}
 }

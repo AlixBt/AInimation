@@ -28,5 +28,6 @@ public:
 	TArray<FNavigationPortalEdge> FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const;
 	float Triarea2(FVector p_vApex, FVector p_vCurrentVector, FVector p_vCandidateVector) const;
 	bool EqualDistance(FVector p_vCurrent, FVector p_vToCheck) const;
-	void ShiftPath(UWorld* p_pWorld, FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const;
+	void ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const;
+	void SmoothPath(TArray<FVector>& p_aRoughPath) const;
 };
