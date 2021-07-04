@@ -19,8 +19,9 @@ Node PathFinder::GetLowestFCostNode(TArray<Node> p_aOpenList) const
 	return bestNode;
 }
 
-PathFinder::PathFinder(ARecastNavMesh* p_pRecastNavMesh) :
-	m_pRecastNavMesh(p_pRecastNavMesh)
+PathFinder::PathFinder(ARecastNavMesh* p_pRecastNavMesh, UNavigationSystemV1* p_pNavigationSystem) :
+	m_pRecastNavMesh(p_pRecastNavMesh),
+	m_pNavigationSystem(p_pNavigationSystem)
 {
 }
 
@@ -306,19 +307,24 @@ void PathFinder::ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FV
 
 void PathFinder::SmoothPath(TArray<FVector>& p_aRoughPath) const
 {
-	for (int i = 0; i < p_aRoughPath.Num() - 2; i++)
+	for (int i = 1; i < p_aRoughPath.Num(); i++)
 	{
-		if (i + 2 == p_aRoughPath.Num() - 1)
+		if (i == p_aRoughPath.Num() - 1)
 			break;
 
-		FVector vSegmentStart = p_aRoughPath[i];
-		FVector vPotentialDelete = p_aRoughPath[i + 1];
-		FVector vSegmentEnd = p_aRoughPath[i + 2];
+		FVector vSegmentStart = p_aRoughPath[i - 1];
+		FVector vPotentialDelete = p_aRoughPath[i];
+		FVector vSegmentEnd = p_aRoughPath[i + 1];
 
-		bool bIsSegmentOnNavmesh = m_pRecastNavMesh->IsSegmentOnNavmesh(vSegmentStart, vSegmentEnd);
+		FVector vHitLocation;
+		FSharedConstNavQueryFilter QueryFilter;
+		bool bIsSegmentOnNavmesh = m_pRecastNavMesh->NavMeshRaycast(&m_pNavigationSystem->GetMainNavDataChecked(), vSegmentStart, vSegmentEnd, vHitLocation, QueryFilter);
 
-		if (bIsSegmentOnNavmesh)
-			p_aRoughPath.Remove(vPotentialDelete);
+		if (!bIsSegmentOnNavmesh)
+		{
+			p_aRoughPath.RemoveAt(i, 1, true);
+			i--;
+		}
 		UE_LOG(LogTemp, Warning, TEXT("Is on navmesh: %s"), bIsSegmentOnNavmesh ? TEXT("true") : TEXT("false"));
 	}
 }

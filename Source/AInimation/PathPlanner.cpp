@@ -60,7 +60,7 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector
 		return false;
 	}
 
-	PathFinder* pPathFinder = new PathFinder(m_pRecastNavMesh);
+	PathFinder* pPathFinder = new PathFinder(m_pRecastNavMesh, m_pNavigationSystem);
 	TArray<NavNodeRef> aPathNodes = pPathFinder->AStar(m_pOwner->GetWorld(), closestNodeToNPC, closestNodeToTarget);
 	
 	if (!aPathNodes.IsEmpty())

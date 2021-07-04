@@ -11,12 +11,13 @@
 class AINIMATION_API PathFinder
 {
 	ARecastNavMesh* m_pRecastNavMesh;
+	UNavigationSystemV1* m_pNavigationSystem;
 
 	// Functions
 	Node GetLowestFCostNode(TArray<Node> p_aOpenList) const;
 
 public:
-	PathFinder(ARecastNavMesh* p_pRecastNavMesh);
+	PathFinder(ARecastNavMesh* p_pRecastNavMesh, UNavigationSystemV1* p_pNavigationSystem);
 	~PathFinder();
 
 	float CalculateHeuristic(NavNodeRef p_sourceNode, NavNodeRef p_targetNode) const;
