@@ -15,11 +15,11 @@ public:
 
 	// Virtual functions override
 	virtual void Activate() override;
-	virtual int Process() override;
+	virtual EStatus Process() override;
 	virtual void Terminate() override;
 	void AddSubgoal(Goal* p_goal);
 
 	// Composite functions
-	int ProcessSubgoals();
+	EStatus ProcessSubgoals();
 	void RemoveAllSubgoals();
 };

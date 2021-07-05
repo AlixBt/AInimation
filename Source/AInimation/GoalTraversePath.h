@@ -20,6 +20,6 @@ public:
 	~GoalTraversePath();
 
 	virtual void Activate() override;
-	virtual int Process() override;
+	virtual EStatus Process() override;
 	virtual void Terminate() override;
 };

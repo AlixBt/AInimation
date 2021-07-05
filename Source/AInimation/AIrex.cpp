@@ -41,3 +41,10 @@ void UAIrex::NativeUpdateAnimation(float p_deltaSeconds)
 
 	}
 }
+
+FVector UAIrex::ForwardKinematics() const
+{
+
+
+	return FVector();
+}

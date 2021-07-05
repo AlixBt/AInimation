@@ -63,7 +63,7 @@ void GoalTraversePath::Activate()
 	}
 }
 
-int GoalTraversePath::Process()
+EStatus GoalTraversePath::Process()
 {
 	if (m_eStatus != EStatus::ES_Active)
 		Activate();
@@ -85,7 +85,7 @@ int GoalTraversePath::Process()
 		}
 	}
 
-	return (uint8)m_eStatus;
+	return m_eStatus;
 }
 
 void GoalTraversePath::Terminate()
@@ -96,4 +96,6 @@ void GoalTraversePath::Terminate()
 	 * Set the NPC's speed
 	 *
 	 */
+
+	
 }

@@ -24,4 +24,7 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float p_deltaSeconds) override;
+
+	// Procedural animation
+	FVector ForwardKinematics() const;
 };

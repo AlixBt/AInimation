@@ -11,19 +11,12 @@ GoalComposite::~GoalComposite()
 
 void GoalComposite::Activate()
 {
-	m_eStatus = EStatus::ES_Active;
-
 	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Activate() - Goal is active"));
 }
 
-int GoalComposite::Process()
+EStatus GoalComposite::Process()
 {
-	if (m_eStatus != EStatus::ES_Active)
-		Activate();
-
-	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Process() - Goal is processing"));
-
-	return (int)m_eStatus;
+	return EStatus::ES_Active;
 }
 
 void GoalComposite::Terminate()
@@ -38,7 +31,7 @@ void GoalComposite::AddSubgoal(Goal* p_goal)
 	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::AddSubgoals() - Goal has been added"));
 }
 
-int GoalComposite::ProcessSubgoals()
+EStatus GoalComposite::ProcessSubgoals()
 {
 	while (m_aSubgoals.Num() > 0 && m_aSubgoals[0]->IsCompleted() || m_aSubgoals[0]->HasFailed())
 	{
@@ -48,18 +41,18 @@ int GoalComposite::ProcessSubgoals()
 
 	if (m_aSubgoals.Num() > 0)
 	{
-		uint8 subgoalsStatus = m_aSubgoals[0]->Process();
+		EStatus subgoalsStatus = m_aSubgoals[0]->Process();
 
-		if (subgoalsStatus == (int)EStatus::ES_Completed && m_aSubgoals.Num() > 1)
+		if (subgoalsStatus == EStatus::ES_Completed && m_aSubgoals.Num() > 1)
 		{
-			return (int)EStatus::ES_Active;
+			return EStatus::ES_Active;
 		}
 
 		return subgoalsStatus;
 	}
 	else
 	{
-		return (int)EStatus::ES_Completed;
+		return EStatus::ES_Completed;
 	}
 }
 

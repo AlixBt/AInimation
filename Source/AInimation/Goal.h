@@ -29,7 +29,7 @@ public:
 
 	// Pure virtual functions
 	virtual void Activate() = 0;
-	virtual int Process() = 0;
+	virtual EStatus Process() = 0;
 	virtual void Terminate() = 0;
 	virtual void AddSubgoal(Goal* p_goal) {}
 
