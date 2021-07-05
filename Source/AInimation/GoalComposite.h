@@ -17,7 +17,7 @@ public:
 	virtual void Activate() override;
 	virtual int Process() override;
 	virtual void Terminate() override;
-	virtual void AddSubgoal(Goal* p_goal) override;
+	void AddSubgoal(Goal* p_goal);
 
 	// Composite functions
 	int ProcessSubgoals();

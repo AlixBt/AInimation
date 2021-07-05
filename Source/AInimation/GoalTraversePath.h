@@ -1,0 +1,25 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Goal.h"
+#include "PathEdge.h"
+
+/**
+ * 
+ */
+class AINIMATION_API GoalTraversePath : public Goal
+{
+	PathEdge m_pathEdge;
+	bool m_bLastEdgeInPath;
+	FVector m_vLastNPCPosition;
+
+	bool NPCIsStuck() const;
+
+public:
+	GoalTraversePath(AAIIrex* p_pOwner, PathEdge p_pathEdge, bool p_bLastEdge);
+	~GoalTraversePath();
+
+	virtual void Activate() override;
+	virtual int Process() override;
+	virtual void Terminate() override;
+};

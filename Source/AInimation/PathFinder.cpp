@@ -137,10 +137,10 @@ TArray<Node> PathFinder::GetNodeNeighbours(NavNodeRef p_nodeRef) const
 	return TArray<Node>();
 }
 
-TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const
+TArray<PathEdge> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const
 {
 	TArray<FNavigationPortalEdge> aPathPortals = FindPortalsFromPath(p_aPathNodes);
-	TArray<FVector> aReturnPath;
+	TArray<FVector> aProcessPath;
 
 	if (!aPathPortals.IsEmpty())
 	{
@@ -148,7 +148,7 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 		FVector vRightPortal = aPathPortals[0].Right;
 		FVector vLeftPortal = aPathPortals[0].Left;
 
-		aReturnPath.Add(p_vStartPosition);
+		aProcessPath.Add(p_vStartPosition);
 
 		int iApexIndex = 0;
 		int iRightIndex = 0;
@@ -171,7 +171,7 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 					ShiftPathPoint(vLeftPortal, vApexPortal, vRight);
 					vApexPortal = vLeftPortal;
 					iApexIndex = iLeftIndex;
-					aReturnPath.Add(vApexPortal);
+					aProcessPath.Add(vApexPortal);
 
 					vLeftPortal = vApexPortal;
 					vRightPortal = vApexPortal;
@@ -195,7 +195,7 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 					ShiftPathPoint(vRightPortal, vApexPortal, vLeft);
 					vApexPortal = vRightPortal;
 					iApexIndex = iRightIndex;
-					aReturnPath.Add(vApexPortal);
+					aProcessPath.Add(vApexPortal);
 
 					vLeftPortal = vApexPortal;
 					vRightPortal = vApexPortal;
@@ -214,7 +214,7 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 
 		
 		
-		aReturnPath.Add(p_vTargetPosition);
+		aProcessPath.Add(p_vTargetPosition);
 		UE_LOG(LogTemp, Warning, TEXT("Last point added"));
 		
 
@@ -223,12 +223,12 @@ TArray<FVector> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef>
 		GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("CrossProduct cost: %f"), Triarea2(vApexPortal, aPathPortals[0].Right, aPathPortals[1].Right)));*/
 	}
 
-	if (!aReturnPath.IsEmpty())
+	if (!aProcessPath.IsEmpty())
 	{
-		SmoothPath(aReturnPath);
+		SmoothPath(aProcessPath);
 	}
 
-	return aReturnPath;
+	return ConvertPath(aProcessPath);
 }
 
 TArray<FNavigationPortalEdge> PathFinder::FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const
@@ -327,4 +327,19 @@ void PathFinder::SmoothPath(TArray<FVector>& p_aRoughPath) const
 		}
 		UE_LOG(LogTemp, Warning, TEXT("Is on navmesh: %s"), bIsSegmentOnNavmesh ? TEXT("true") : TEXT("false"));
 	}
+}
+
+TArray<PathEdge> PathFinder::ConvertPath(TArray<FVector> p_aPath) const
+{
+	TArray<PathEdge> aPathEdge;
+
+	if (!p_aPath.IsEmpty())
+	{
+		for (int i = 0; i < p_aPath.Num() - 1; i++)
+		{
+			aPathEdge.Add(PathEdge(p_aPath[i], p_aPath[i + 1], EBehaviorType::EBT_Normal));
+		}
+	}
+
+	return aPathEdge;
 }

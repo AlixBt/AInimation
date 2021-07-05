@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIIrex.h"
 
 /**
  * 
@@ -17,7 +18,7 @@ enum class EStatus : uint8
 class AINIMATION_API Goal
 {
 protected:
-	class AAIIrex* m_pOwner;
+	AAIIrex* m_pOwner;
 	EStatus m_eStatus;
 	int m_iType;
 
@@ -30,7 +31,7 @@ public:
 	virtual void Activate() = 0;
 	virtual int Process() = 0;
 	virtual void Terminate() = 0;
-	virtual void AddSubgoal(Goal* p_goal) = 0;
+	virtual void AddSubgoal(Goal* p_goal) {}
 
 	// Getters
 	bool IsActive() const;

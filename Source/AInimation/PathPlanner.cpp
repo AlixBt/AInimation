@@ -3,6 +3,7 @@
 #include "NavMesh/RecastNavMesh.h"
 #include "DrawDebugHelpers.h"
 #include "PathFinder.h"
+#include "PathEdge.h"
 
 PathPlanner::PathPlanner(AAIIrex* p_pOwner) :
 	m_pOwner(p_pOwner),
@@ -65,13 +66,13 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector
 	
 	if (!aPathNodes.IsEmpty())
 	{
-		TArray<FVector> aPathVectors = pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
+		TArray<PathEdge> aPathVectors = pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
 		
 		if (!aPathVectors.IsEmpty())
 		{
-			for (int i = 0; i < aPathVectors.Num() - 1; i++)
+			for (int i = 0; i < aPathVectors.Num(); i++)
 			{
-				DrawDebugLine(m_pOwner->GetWorld(), aPathVectors[i], aPathVectors[i + 1], FColor::Purple, false, -1.0f, 0, 5.0f);
+				DrawDebugLine(m_pOwner->GetWorld(), aPathVectors[i].GetSourcePosition(), aPathVectors[i].GetDestinationPosition(), FColor::Purple, false, -1.0f, 0, 5.0f);
 			}
 		}
 	}
