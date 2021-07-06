@@ -25,7 +25,7 @@ protected:
 public:
 	Goal(AAIIrex* p_pOwner);
 	Goal(AAIIrex* p_pOwner ,int p_iType);
-	~Goal();
+	virtual ~Goal();
 
 	// Pure virtual functions
 	virtual void Activate() = 0;

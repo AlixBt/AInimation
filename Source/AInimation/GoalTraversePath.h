@@ -17,7 +17,7 @@ class AINIMATION_API GoalTraversePath : public Goal
 
 public:
 	GoalTraversePath(AAIIrex* p_pOwner, PathEdge p_pathEdge, bool p_bLastEdge);
-	~GoalTraversePath();
+	virtual ~GoalTraversePath();
 
 	virtual void Activate() override;
 	virtual EStatus Process() override;

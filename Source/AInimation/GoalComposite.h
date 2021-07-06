@@ -11,7 +11,7 @@ class AINIMATION_API GoalComposite : public Goal
 	TArray<Goal*> m_aSubgoals;
 public:
 	GoalComposite(AAIIrex* p_pOwner);
-	~GoalComposite();
+	virtual ~GoalComposite();
 
 	// Virtual functions override
 	virtual void Activate() override;

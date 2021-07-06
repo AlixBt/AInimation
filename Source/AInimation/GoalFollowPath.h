@@ -13,7 +13,7 @@ class AINIMATION_API GoalFollowPath : public GoalComposite
 
 public:
 	GoalFollowPath(AAIIrex* p_pOwner, TArray<PathEdge> p_aPath);
-	~GoalFollowPath();
+	virtual ~GoalFollowPath();
 
 	// Override function
 	virtual void Activate() override;
