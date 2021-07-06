@@ -49,6 +49,10 @@ EStatus GoalFollowPath::Process()
 	{
 		Activate();
 	}
+	else
+	{
+		m_pOwner->getPath()->IncrementPathIndex();
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("GoalFollowPath::Process() - Goal is processing"));
 

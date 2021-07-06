@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "NavigationSystem.h"
 
+class PathEdge;
+
 /**
  * 
  */
@@ -20,6 +22,6 @@ public:
 	// Path planning functions
 	void InitializeNavMesh(UNavigationSystemV1* p_pNavigationSystem);
 	NavNodeRef GetClosestNodeToPosition(FVector p_vPosition) const;
-	bool CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector>& p_aPath);
+	bool CreatePathToPosition(FVector p_vTargetPosition, TArray<PathEdge>& p_aPath);
 		
 };

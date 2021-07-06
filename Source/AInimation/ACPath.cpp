@@ -48,6 +48,13 @@ void AACPath::SetPathIndex(int p_pathIndex)
 
 void AACPath::IncrementPathIndex()
 {
-	m_pathIndex++;
+	if (m_pathIndex == m_path.Num() - 1)
+	{
+		m_pathIndex = 0;
+	}
+	else
+	{
+		++m_pathIndex;
+	}
 }
 

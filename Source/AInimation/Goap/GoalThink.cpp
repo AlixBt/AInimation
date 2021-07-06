@@ -1,5 +1,10 @@
 #include "GoalThink.h"
+#include "GoalFollowPath.h"
 #include "ExploreGoalEvaluator.h"
+#include "NavigationSystem.h"
+#include "../Pathfinding/PathPlanner.h"
+#include "../Pathfinding/PathEdge.h"
+#include "../ACPath.h"
 
 GoalThink::GoalThink(AAIIrex* p_pOwner) :
 	GoalComposite(p_pOwner)
@@ -13,11 +18,17 @@ GoalThink::~GoalThink()
 
 void GoalThink::Activate()
 {
+	m_eStatus = EStatus::ES_Active;
 }
 
 EStatus GoalThink::Process()
 {
-	return EStatus();
+	if (m_eStatus != EStatus::ES_Active)
+		Activate();
+
+	m_eStatus = ProcessSubgoals();
+
+	return m_eStatus;
 }
 
 void GoalThink::Terminate()
@@ -44,10 +55,17 @@ void GoalThink::arbitrate()
 	{
 		bestEvaluator->setGoal(m_pOwner);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("GoalThink::arbitrate() - calculate best goal cost"));
 }
 
 void GoalThink::addGoalExplore()
 {
+	// We choose an arbitrary position on the navmesh
+	AACPath* m_path = m_pOwner->getPath();
+	FVector point = m_path->GetPathPoint();
+
+	TArray<PathEdge> pathfind;
+	m_pOwner->getPathPlanner()->CreatePathToPosition(point, pathfind);
+
+	AddSubgoal(new GoalFollowPath(m_pOwner, pathfind));
 	UE_LOG(LogTemp, Warning, TEXT("GoalThink::addGoalExplore() - follow a path to an arbitrary point"));
 }

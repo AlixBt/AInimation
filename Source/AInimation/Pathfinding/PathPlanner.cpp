@@ -46,7 +46,7 @@ NavNodeRef PathPlanner::GetClosestNodeToPosition(FVector p_vPosition) const
 	return -1;
 }
 
-bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector>& p_aPath)
+bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<PathEdge>& p_aPath)
 {
 	m_vDestinationToReach = p_vTargetPosition;
 
@@ -66,13 +66,13 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<FVector
 	
 	if (!aPathNodes.IsEmpty())
 	{
-		TArray<PathEdge> aPathVectors = pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
+		p_aPath = pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
 		
-		if (!aPathVectors.IsEmpty())
+		if (!p_aPath.IsEmpty())
 		{
-			for (int i = 0; i < aPathVectors.Num(); i++)
+			for (int i = 0; i < p_aPath.Num(); i++)
 			{
-				DrawDebugLine(m_pOwner->GetWorld(), aPathVectors[i].GetSourcePosition(), aPathVectors[i].GetDestinationPosition(), FColor::Purple, false, -1.0f, 0, 5.0f);
+				DrawDebugLine(m_pOwner->GetWorld(), p_aPath[i].GetSourcePosition(), p_aPath[i].GetDestinationPosition(), FColor::Purple, false, -1.0f, 0, 5.0f);
 			}
 		}
 	}

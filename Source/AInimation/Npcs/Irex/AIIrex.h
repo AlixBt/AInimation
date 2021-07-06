@@ -50,6 +50,9 @@ public:
 	bool GetPreyIsFound() const;
 	ACIrex* GetNPC() const;
 	GoalThink* getBrain() const;
+	PathPlanner* getPathPlanner() const;
+	UNavigationSystemV1* getNavigationSystem() const;
+	AACPath* getPath() const;
 
 	// Pathfinding
 	void FollowPath();

@@ -45,6 +45,11 @@ void AAIIrex::BeginPlay()
 	{
 		m_pPathPlanner->InitializeNavMesh(m_pNavigationSystem);
 	}
+
+	if (m_brain != nullptr)
+	{
+		m_brain->arbitrate();
+	}
 }
 
 void AAIIrex::OnPossess(APawn* const p_pawn)
@@ -70,13 +75,15 @@ void AAIIrex::Tick(float p_deltaTime)
 	// Main tick loop
 	if (m_npcCharacter && m_npcAnimInstance)
 	{
-		//m_pStateMachine->Update();
-		TArray<FVector> aPath;
-		m_pPathPlanner->CreatePathToPosition(FVector(-2450.0f, 2200.0f, 0.0f), aPath);
 
 		if (m_brain != nullptr)
 		{
-			m_brain->arbitrate();
+			EStatus status = m_brain->Process();
+
+			if (status == EStatus::ES_Completed)
+			{
+				m_brain->arbitrate();
+			}
 		}
 	}
 }
@@ -96,6 +103,16 @@ GoalThink* AAIIrex::getBrain() const
 	return m_brain;
 }
 
+PathPlanner* AAIIrex::getPathPlanner() const
+{
+	return m_pPathPlanner;
+}
+
+UNavigationSystemV1* AAIIrex::getNavigationSystem() const
+{
+	return m_pNavigationSystem;
+}
+
 void AAIIrex::FollowPath()
 {
 	int pathIndex = m_path->GetPathIndex();
@@ -112,4 +129,9 @@ void AAIIrex::FollowPath()
 	{
 		m_path->IncrementPathIndex();
 	}
+}
+
+AACPath* AAIIrex::getPath() const
+{
+	return m_path;
 }
