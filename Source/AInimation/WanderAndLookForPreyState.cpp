@@ -1,5 +1,5 @@
 #include "WanderAndLookForPreyState.h"
-#include "AIIrex.h"
+#include "Npcs/Irex/AIIrex.h"
 
 WanderAndLookForPreyState* WanderAndLookForPreyState::Instance()
 {

@@ -1,5 +1,5 @@
 #include "IrexGlobalState.h"
-#include "AIIrex.h"
+#include "Npcs/Irex/AIIrex.h"
 
 IrexGlobalState* IrexGlobalState::Instance()
 {

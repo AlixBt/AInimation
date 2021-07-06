@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AIIrex.h"
+#include "../Npcs/Irex/AIIrex.h"
 
 /**
  * 

@@ -207,20 +207,9 @@ TArray<PathEdge> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef
 					continue;
 				}
 			}
-
-			//DrawDebugBox(p_pWorld, aPathPortals[i].Right, FVector(20.0f, 20.0f, 20.0f), FColor::Green, false, -1.0f, 0, 2.0f);
-			//DrawDebugBox(p_pWorld, aPathPortals[i].Left, FVector(20.0f, 20.0f, 20.0f), FColor::Red, false, -1.0f, 0, 2.0f);
 		}
 
-		
-		
 		aProcessPath.Add(p_vTargetPosition);
-		UE_LOG(LogTemp, Warning, TEXT("Last point added"));
-		
-
-		/*DrawDebugLine(p_pWorld, vApexPortal, aPathPortals[0].Right, FColor::Green);
-		DrawDebugLine(p_pWorld, vApexPortal, aPathPortals[1].Right, FColor::Red);
-		GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Purple, FString::Printf(TEXT("CrossProduct cost: %f"), Triarea2(vApexPortal, aPathPortals[0].Right, aPathPortals[1].Right)));*/
 	}
 
 	if (!aProcessPath.IsEmpty())
@@ -325,7 +314,6 @@ void PathFinder::SmoothPath(TArray<FVector>& p_aRoughPath) const
 			p_aRoughPath.RemoveAt(i, 1, true);
 			i--;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Is on navmesh: %s"), bIsSegmentOnNavmesh ? TEXT("true") : TEXT("false"));
 	}
 }
 

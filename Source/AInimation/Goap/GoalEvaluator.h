@@ -9,6 +9,7 @@ class AAIIrex;
  */
 class AINIMATION_API GoalEvaluator
 {
+
 public:
 	GoalEvaluator();
 	virtual ~GoalEvaluator();

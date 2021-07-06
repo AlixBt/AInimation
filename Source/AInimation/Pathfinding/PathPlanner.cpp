@@ -1,5 +1,5 @@
 #include "PathPlanner.h"
-#include "AIIrex.h"
+#include "../Npcs/Irex/AIIrex.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "DrawDebugHelpers.h"
 #include "PathFinder.h"

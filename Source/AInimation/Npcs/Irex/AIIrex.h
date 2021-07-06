@@ -4,11 +4,13 @@
 #include "AIController.h"
 #include "CIrex.h"
 #include "AIrex.h"
-#include "StateMachine.h"
-#include "ACPath.h"
+#include "../../StateMachine.h"
+#include "../../ACPath.h"
 #include "NavigationSystem.h"
-#include "PathPlanner.h"
+#include "../../Pathfinding/PathPlanner.h"
 #include "AIIrex.generated.h"
+
+class GoalThink;
 
 /**
  * 
@@ -17,6 +19,9 @@ UCLASS()
 class AINIMATION_API AAIIrex : public AAIController
 {
 	GENERATED_BODY()
+
+	// G.O.A.P system
+	GoalThink* m_brain;
 
 	// Finite state machine
 	StateMachine<AAIIrex>* m_pStateMachine;
@@ -44,6 +49,7 @@ public:
 	// Getters
 	bool GetPreyIsFound() const;
 	ACIrex* GetNPC() const;
+	GoalThink* getBrain() const;
 
 	// Pathfinding
 	void FollowPath();

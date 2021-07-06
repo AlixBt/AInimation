@@ -1,16 +1,19 @@
 #include "AIIrex.h"
-#include "IrexGlobalState.h"
-#include "WanderAndLookForPreyState.h"
+#include "../../IrexGlobalState.h"
+#include "../../WanderAndLookForPreyState.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "../../Goap/GoalThink.h"
 
 AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
+	Super(p_objectInitializer),
 	m_npcCharacter(nullptr),
 	m_npcAnimInstance(nullptr),
 	m_path(nullptr),
 	m_bPreyIsFound(false),
-	m_pNavigationSystem(nullptr)
+	m_pNavigationSystem(nullptr),
+	m_brain(new GoalThink(this))
 {
 	// Initialization
 	m_pStateMachine = new StateMachine<AAIIrex>(this);
@@ -70,6 +73,11 @@ void AAIIrex::Tick(float p_deltaTime)
 		//m_pStateMachine->Update();
 		TArray<FVector> aPath;
 		m_pPathPlanner->CreatePathToPosition(FVector(-2450.0f, 2200.0f, 0.0f), aPath);
+
+		if (m_brain != nullptr)
+		{
+			m_brain->arbitrate();
+		}
 	}
 }
 
@@ -81,6 +89,11 @@ bool AAIIrex::GetPreyIsFound() const
 ACIrex* AAIIrex::GetNPC() const
 {
 	return m_npcCharacter;
+}
+
+GoalThink* AAIIrex::getBrain() const
+{
+	return m_brain;
 }
 
 void AAIIrex::FollowPath()

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GoalComposite.h"
-#include "PathEdge.h"
+#include "../Pathfinding/PathEdge.h"
 
 /**
  * 
