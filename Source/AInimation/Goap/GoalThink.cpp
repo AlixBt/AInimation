@@ -59,13 +59,15 @@ void GoalThink::arbitrate()
 
 void GoalThink::addGoalExplore()
 {
-	// We choose an arbitrary position on the navmesh
-	AACPath* m_path = m_pOwner->getPath();
-	FVector point = m_path->GetPathPoint();
+	if (!m_pOwner->getIsFollowingPath())
+	{
+		// We choose an arbitrary position on the navmesh
+		AACPath* m_path = m_pOwner->getPath();
+		FVector point = m_path->GetPathPoint();
 
-	TArray<PathEdge> pathfind;
-	m_pOwner->getPathPlanner()->CreatePathToPosition(point, pathfind);
+		TArray<PathEdge> pathfind;
+		m_pOwner->getPathPlanner()->CreatePathToPosition(point, pathfind);
 
-	AddSubgoal(new GoalFollowPath(m_pOwner, pathfind));
-	UE_LOG(LogTemp, Warning, TEXT("GoalThink::addGoalExplore() - follow a path to an arbitrary point"));
+		AddSubgoal(new GoalFollowPath(m_pOwner, pathfind));
+	}
 }

@@ -8,12 +8,12 @@
 
 AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
 	Super(p_objectInitializer),
+	m_brain(new GoalThink(this)),
+	m_bPreyIsFound(false),
 	m_npcCharacter(nullptr),
 	m_npcAnimInstance(nullptr),
-	m_path(nullptr),
-	m_bPreyIsFound(false),
 	m_pNavigationSystem(nullptr),
-	m_brain(new GoalThink(this))
+	m_path(nullptr)
 {
 	// Initialization
 	m_pStateMachine = new StateMachine<AAIIrex>(this);
@@ -78,12 +78,10 @@ void AAIIrex::Tick(float p_deltaTime)
 
 		if (m_brain != nullptr)
 		{
+			m_brain->arbitrate();
 			EStatus status = m_brain->Process();
-
-			if (status == EStatus::ES_Completed)
-			{
-				m_brain->arbitrate();
-			}
+			GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Red, FString::Printf(TEXT("Index: %i"), m_path->GetPathIndex()));
+			GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Yellow, FString::Printf(TEXT("Is following a path: %s"), m_bIsFollowingPath ? TEXT("true") : TEXT("false")));
 		}
 	}
 }
@@ -134,4 +132,14 @@ void AAIIrex::FollowPath()
 AACPath* AAIIrex::getPath() const
 {
 	return m_path;
+}
+
+bool AAIIrex::getIsFollowingPath() const
+{
+	return m_bIsFollowingPath;
+}
+
+void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
+{
+	m_bIsFollowingPath = t_bIsFollowingPath;
 }

@@ -27,6 +27,7 @@ class AINIMATION_API AAIIrex : public AAIController
 	StateMachine<AAIIrex>* m_pStateMachine;
 
 	bool m_bPreyIsFound;
+	bool m_bIsFollowingPath{ false };
 
 	// Utility
 	ACIrex* m_npcCharacter;
@@ -53,6 +54,10 @@ public:
 	PathPlanner* getPathPlanner() const;
 	UNavigationSystemV1* getNavigationSystem() const;
 	AACPath* getPath() const;
+	bool getIsFollowingPath() const;
+
+	// Setters
+	void setIsFollowingPath(bool t_bIsFollowingPath);
 
 	// Pathfinding
 	void FollowPath();

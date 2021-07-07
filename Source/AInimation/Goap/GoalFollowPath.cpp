@@ -15,6 +15,8 @@ void GoalFollowPath::Activate()
 {
 	m_eStatus = EStatus::ES_Active;
 
+	m_pOwner->setIsFollowingPath(true);
+
 	// We get the next edge and remove it from the array
 	PathEdge nextEdge = m_aPath[0];
 	m_aPath.RemoveAt(0, 1, true);
@@ -29,12 +31,9 @@ void GoalFollowPath::Activate()
 	}
 	default:
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GoalFollowPath::Activate() - Unrecognized behavior type"));
 		break;
 	}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("GoalFollowPath"));
 }
 
 EStatus GoalFollowPath::Process()
@@ -49,12 +48,6 @@ EStatus GoalFollowPath::Process()
 	{
 		Activate();
 	}
-	else
-	{
-		m_pOwner->getPath()->IncrementPathIndex();
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("GoalFollowPath::Process() - Goal is processing"));
 
 	return m_eStatus;
 }

@@ -11,7 +11,6 @@ GoalComposite::~GoalComposite()
 
 void GoalComposite::Activate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Activate() - Goal is active"));
 }
 
 EStatus GoalComposite::Process()
@@ -21,14 +20,11 @@ EStatus GoalComposite::Process()
 
 void GoalComposite::Terminate()
 {
-	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::Terminate() - Goal is terminated"));
 }
 
 void GoalComposite::AddSubgoal(Goal* p_goal)
 {
 	m_aSubgoals.Insert(p_goal, 0);
-
-	UE_LOG(LogTemp, Warning, TEXT("GoalComposite::AddSubgoals() - Goal has been added"));
 }
 
 EStatus GoalComposite::ProcessSubgoals()
@@ -39,7 +35,7 @@ EStatus GoalComposite::ProcessSubgoals()
 		m_aSubgoals.RemoveAt(0, 1, true);
 	}
 
-	if (m_aSubgoals.Num() > 0)
+	if (!m_aSubgoals.IsEmpty())
 	{
 		EStatus subgoalsStatus = m_aSubgoals[0]->Process();
 
@@ -50,6 +46,7 @@ EStatus GoalComposite::ProcessSubgoals()
 
 		return subgoalsStatus;
 	}
+
 	else
 	{
 		return EStatus::ES_Completed;
