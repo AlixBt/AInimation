@@ -29,10 +29,17 @@ void GoalComposite::AddSubgoal(Goal* p_goal)
 
 EStatus GoalComposite::ProcessSubgoals()
 {
-	while (m_aSubgoals.Num() > 0 && m_aSubgoals[0]->IsCompleted() || m_aSubgoals[0]->HasFailed())
+	while (!m_aSubgoals.IsEmpty() && m_aSubgoals[0]->IsCompleted() 
+		   || m_aSubgoals[0]->HasFailed())
 	{
 		m_aSubgoals[0]->Terminate();
+		delete m_aSubgoals[0];
 		m_aSubgoals.RemoveAt(0, 1, true);
+
+		if (m_aSubgoals.IsEmpty())
+		{
+			break;
+		}
 	}
 
 	if (!m_aSubgoals.IsEmpty())

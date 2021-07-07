@@ -81,7 +81,7 @@ void AAIIrex::Tick(float p_deltaTime)
 			m_brain->arbitrate();
 			EStatus status = m_brain->Process();
 			GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Red, FString::Printf(TEXT("Index: %i"), m_path->GetPathIndex()));
-			GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Yellow, FString::Printf(TEXT("Is following a path: %s"), m_bIsFollowingPath ? TEXT("true") : TEXT("false")));
+			GEngine->AddOnScreenDebugMessage(1, -1.0f, FColor::Yellow, FString::Printf(TEXT("Is following a path: %s"), m_bIsFollowingPath ? TEXT("true") : TEXT("false")));
 		}
 	}
 }

@@ -3,8 +3,8 @@
 #include "ExploreGoalEvaluator.h"
 #include "NavigationSystem.h"
 #include "../Pathfinding/PathPlanner.h"
-#include "../Pathfinding/PathEdge.h"
 #include "../ACPath.h"
+#include "DrawDebugHelpers.h"
 
 GoalThink::GoalThink(AAIIrex* p_pOwner) :
 	GoalComposite(p_pOwner)
@@ -27,6 +27,14 @@ EStatus GoalThink::Process()
 		Activate();
 
 	m_eStatus = ProcessSubgoals();
+
+	if (!m_path.IsEmpty())
+	{
+		for (int i = 0; i < m_path.Num(); i++)
+		{
+			DrawDebugLine(m_pOwner->GetWorld(), m_path[i].GetSourcePosition(), m_path[i].GetDestinationPosition(), FColor::Purple, false, -1.0f, 0, 5.0f);
+		}
+	}
 
 	return m_eStatus;
 }
@@ -59,15 +67,14 @@ void GoalThink::arbitrate()
 
 void GoalThink::addGoalExplore()
 {
+	// We choose an arbitrary position on the navmesh
+	AACPath* path = m_pOwner->getPath();
+	FVector point = path->GetPathPoint();
+	
 	if (!m_pOwner->getIsFollowingPath())
 	{
-		// We choose an arbitrary position on the navmesh
-		AACPath* m_path = m_pOwner->getPath();
-		FVector point = m_path->GetPathPoint();
-
-		TArray<PathEdge> pathfind;
-		m_pOwner->getPathPlanner()->CreatePathToPosition(point, pathfind);
-
-		AddSubgoal(new GoalFollowPath(m_pOwner, pathfind));
+		m_pOwner->getPathPlanner()->CreatePathToPosition(point, m_path);
+		AddSubgoal(new GoalFollowPath(m_pOwner, m_path));
+		UE_LOG(LogTemp, Warning, TEXT("Path found"));
 	}
 }

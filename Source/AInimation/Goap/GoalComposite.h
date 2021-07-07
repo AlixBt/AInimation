@@ -8,6 +8,7 @@
  */
 class AINIMATION_API GoalComposite : public Goal
 {
+protected:
 	TArray<Goal*> m_aSubgoals;
 public:
 	GoalComposite(AAIIrex* p_pOwner);
