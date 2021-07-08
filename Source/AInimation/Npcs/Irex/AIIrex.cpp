@@ -1,27 +1,22 @@
 #include "AIIrex.h"
-#include "../../IrexGlobalState.h"
-#include "../../WanderAndLookForPreyState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "../../Goap/GoalThink.h"
+#include "../../AI/SteeringBehaviors.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
-	Super(p_objectInitializer),
 	m_brain(new GoalThink(this)),
-	m_bPreyIsFound(false),
 	m_npcCharacter(nullptr),
 	m_npcAnimInstance(nullptr),
 	m_pNavigationSystem(nullptr),
 	m_path(nullptr)
 {
 	// Initialization
-	m_pStateMachine = new StateMachine<AAIIrex>(this);
-
-	m_pStateMachine->SetCurrentState(WanderAndLookForPreyState::Instance());
-	m_pStateMachine->SetGlobalState(IrexGlobalState::Instance());
-
 	m_pPathPlanner = new PathPlanner(this);
+	m_steeringBehaviors = new SteeringBehaviors(this);
 }
 
 void AAIIrex::BeginPlay()
@@ -44,11 +39,6 @@ void AAIIrex::BeginPlay()
 	if (m_pNavigationSystem)
 	{
 		m_pPathPlanner->InitializeNavMesh(m_pNavigationSystem);
-	}
-
-	if (m_brain != nullptr)
-	{
-		m_brain->arbitrate();
 	}
 }
 
@@ -78,17 +68,14 @@ void AAIIrex::Tick(float p_deltaTime)
 
 		if (m_brain != nullptr)
 		{
+			updateSteeringBehaviors();
+
 			m_brain->arbitrate();
 			EStatus status = m_brain->Process();
 			GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Red, FString::Printf(TEXT("Index: %i"), m_path->GetPathIndex()));
 			GEngine->AddOnScreenDebugMessage(1, -1.0f, FColor::Yellow, FString::Printf(TEXT("Is following a path: %s"), m_bIsFollowingPath ? TEXT("true") : TEXT("false")));
 		}
 	}
-}
-
-bool AAIIrex::GetPreyIsFound() const
-{
-	return m_bPreyIsFound;
 }
 
 ACIrex* AAIIrex::GetNPC() const
@@ -111,24 +98,6 @@ UNavigationSystemV1* AAIIrex::getNavigationSystem() const
 	return m_pNavigationSystem;
 }
 
-void AAIIrex::FollowPath()
-{
-	int pathIndex = m_path->GetPathIndex();
-
-	if (pathIndex == m_path->GetPath().Num())
-	{
-		m_path->SetPathIndex(0);
-	}
-
-	EPathFollowingRequestResult::Type pathResult;
-	pathResult = MoveToLocation(m_path->GetPathPoint(), 50.0f);
-
-	if (pathResult == 1)
-	{
-		m_path->IncrementPathIndex();
-	}
-}
-
 AACPath* AAIIrex::getPath() const
 {
 	return m_path;
@@ -139,7 +108,76 @@ bool AAIIrex::getIsFollowingPath() const
 	return m_bIsFollowingPath;
 }
 
+SteeringBehaviors* AAIIrex::getSteeringBehaviors() const
+{
+	return m_steeringBehaviors;
+}
+
+FVector AAIIrex::getVelocity() const
+{
+	return m_velocity;
+}
+
+FVector AAIIrex::getForwardVector() const
+{
+	return m_forwardVector;
+}
+
+FVector AAIIrex::getRightVector() const
+{
+	return m_rightVector;
+}
+
+float AAIIrex::getMass() const
+{
+	return m_mass;
+}
+
+float AAIIrex::getMaxSpeed() const
+{
+	return m_maxSpeed;
+}
+
+float AAIIrex::getMaxForce() const
+{
+	return m_maxForce;
+}
+
+float AAIIrex::getMaxTurnRate() const
+{
+	return m_maxTurnRate;
+}
+
 void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
 {
 	m_bIsFollowingPath = t_bIsFollowingPath;
+}
+
+void AAIIrex::updateSteeringBehaviors()
+{
+	FVector steeringForce = m_steeringBehaviors->calculate();
+	/* FVector acceleration = steeringForce / m_mass;
+	m_velocity += acceleration * GetWorld()->DeltaTimeSeconds;
+
+	if (m_velocity.Size() > m_maxSpeed)
+	{
+		UKismetMathLibrary::ClampVectorSize(m_velocity, 0.0f, m_maxSpeed);
+	} */
+
+	FRotator nextRotation = steeringForce.ToOrientationRotator();
+	m_npcCharacter->SetActorRotation(UKismetMathLibrary::RInterpTo(
+		                             m_npcCharacter->GetActorRotation(), nextRotation, 
+									 GetWorld()->DeltaTimeSeconds, 
+									 30.0f));
+
+	m_npcCharacter->AddActorWorldOffset(m_npcCharacter->GetActorForwardVector() * 
+	                                    m_maxSpeed * GetWorld()->DeltaTimeSeconds);
+
+	if (m_velocity.Size() > 0.00000001f)
+	{
+		m_forwardVector = m_velocity.GetSafeNormal(1.0f);
+		m_rightVector = m_forwardVector.RightVector;
+	}
+
+	m_maxSpeed = m_npcCharacter->GetCharacterMovement()->MaxWalkSpeed;
 }

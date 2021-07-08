@@ -4,13 +4,13 @@
 #include "AIController.h"
 #include "CIrex.h"
 #include "AIrex.h"
-#include "../../StateMachine.h"
 #include "../../ACPath.h"
 #include "NavigationSystem.h"
 #include "../../Pathfinding/PathPlanner.h"
 #include "AIIrex.generated.h"
 
 class GoalThink;
+class SteeringBehaviors;
 
 /**
  * 
@@ -22,11 +22,6 @@ class AINIMATION_API AAIIrex : public AAIController
 
 	// G.O.A.P system
 	GoalThink* m_brain;
-
-	// Finite state machine
-	StateMachine<AAIIrex>* m_pStateMachine;
-
-	bool m_bPreyIsFound;
 	bool m_bIsFollowingPath{ false };
 
 	// Utility
@@ -37,6 +32,18 @@ class AINIMATION_API AAIIrex : public AAIController
 	// PathFinding
 	PathPlanner* m_pPathPlanner;
 	AACPath* m_path;
+
+	// Steering behaviors
+	SteeringBehaviors* m_steeringBehaviors;
+
+	FVector m_velocity { FVector::ZeroVector };
+	FVector m_forwardVector { FVector::ZeroVector };
+	FVector m_rightVector { FVector::ZeroVector };
+
+	const float m_mass { 5400.0f };
+	float m_maxSpeed { 0.0f };
+	const float m_maxForce{ 52920.0f };
+	const float m_maxTurnRate{ 10.0f };
 
 public:
 	// Constructor
@@ -56,9 +63,18 @@ public:
 	AACPath* getPath() const;
 	bool getIsFollowingPath() const;
 
+	SteeringBehaviors* getSteeringBehaviors() const;
+
+	FVector getVelocity() const;
+	FVector getForwardVector() const;
+	FVector getRightVector() const;
+
+	float getMass() const;
+	float getMaxSpeed() const;
+	float getMaxForce() const;
+	float getMaxTurnRate() const;
+
 	// Setters
 	void setIsFollowingPath(bool t_bIsFollowingPath);
-
-	// Pathfinding
-	void FollowPath();
+	void updateSteeringBehaviors();
 };
