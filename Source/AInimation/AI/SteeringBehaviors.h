@@ -10,7 +10,7 @@ class AAIIrex;
 class AINIMATION_API SteeringBehaviors
 {
 	AAIIrex* m_owner;
-	FVector m_targetPosition{ FVector::ZeroVector };
+	FVector m_targetPosition;
 
 	// Steering behaviors switchs
 	bool m_bSeekIsOn { false };
@@ -28,6 +28,7 @@ public:
 
 	FVector calculate() const;
 
+	FVector getTargetPosition() const;
 	void setTargetPosition(FVector t_targetPosition);
 
 	void seekOn();

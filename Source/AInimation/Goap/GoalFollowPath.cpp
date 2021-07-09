@@ -26,7 +26,6 @@ void GoalFollowPath::Activate()
 	{
 		case EBehaviorType::EBT_Normal:
 		{
-			UE_LOG(LogTemp, Warning, TEXT("GoalFollowPath::Activate - Traverse path added"));
 			AddSubgoal(new GoalTraversePath(m_pOwner, nextEdge, m_aPath.IsEmpty()));
 			break;
 		}
@@ -46,7 +45,6 @@ EStatus GoalFollowPath::Process()
 	// call the Activate function to grab the next edge
 	if (!m_aSubgoals.IsEmpty())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GoalFollowPath::Process() - Process subgoals"));
 		m_eStatus = ProcessSubgoals();
 	}
 

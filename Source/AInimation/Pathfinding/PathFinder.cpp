@@ -276,7 +276,7 @@ void PathFinder::ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FV
 
 		if (FVector::DotProduct(vHorizontalVector, vOrthogonalVector) == 0.0f)
 		{
-			FVector vPointToTest = p_vPointToAdd + (vOrthogonalVector.GetSafeNormal() * 200.0f);
+			FVector vPointToTest = p_vPointToAdd + (vOrthogonalVector.GetSafeNormal() * 400.0f);
 			FNavLocation OutLocation;
 			FVector vExtent = FVector::ZeroVector;
 
@@ -288,7 +288,7 @@ void PathFinder::ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FV
 			}
 			else
 			{
-				p_vPointToAdd = p_vPointToAdd + (-vOrthogonalVector.GetSafeNormal() * 200.0f);
+				p_vPointToAdd = p_vPointToAdd + (-vOrthogonalVector.GetSafeNormal() * 400.0f);
 			}
 		}
 	}

@@ -15,7 +15,7 @@ ACIrex::ACIrex()
 
 	GetCharacterMovement()->MaxWalkSpeed = 323.0f;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 100.0f, 0.0f);
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 
 }
 

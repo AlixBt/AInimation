@@ -69,11 +69,11 @@ void GoalThink::addGoalExplore()
 {
 	// We choose an arbitrary position on the navmesh
 	AACPath* path = m_pOwner->getPath();
-	FVector point = path->GetPathPoint();
+	FVector worldPoint = path->GetTransform().TransformPosition(path->GetPathPoint());
 	
 	if (!m_pOwner->getIsFollowingPath())
 	{
-		m_pOwner->getPathPlanner()->CreatePathToPosition(point, m_path);
+		m_pOwner->getPathPlanner()->CreatePathToPosition(worldPoint, m_path);
 		AddSubgoal(new GoalFollowPath(m_pOwner, m_path));
 		UE_LOG(LogTemp, Warning, TEXT("Path found"));
 	}

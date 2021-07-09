@@ -57,13 +57,11 @@ void GoalTraversePath::Activate()
 	// the NPC should arrive at the position, else it should seek
 	if (m_bLastEdgeInPath)
 	{
-		m_pOwner->getSteeringBehaviors()->seekOn();
-		UE_LOG(LogTemp, Warning, TEXT("Last edge: move to location"));
+		//m_pOwner->MoveToLocation(m_pathEdge.GetDestinationPosition(), 1.0f);
 	}
 	else
 	{
-		m_pOwner->getSteeringBehaviors()->seekOn();
-		UE_LOG(LogTemp, Warning, TEXT("Move to location"));
+		//m_pOwner->MoveToLocation(m_pathEdge.GetDestinationPosition(), 1.0f);
 	}
 }
 
@@ -71,8 +69,6 @@ EStatus GoalTraversePath::Process()
 {
 	if (m_eStatus != EStatus::ES_Active)
 		Activate();
-
-	UE_LOG(LogTemp, Warning, TEXT("GoalTraversePath - Process"));
 
 	// If the NPC is stuck, return failure
 	/*if (NPCIsStuck())
@@ -82,9 +78,8 @@ EStatus GoalTraversePath::Process()
 	}
 	else*/
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Npc is moving"));
 		// We check if the NPC is at destination with a radius of 50.0f
-		if (m_pOwner->GetNPC()->GetActorLocation().Equals(m_pathEdge.GetDestinationPosition(), 75.0f))
+		if (m_pOwner->GetNPC()->GetActorLocation().Equals(m_pathEdge.GetDestinationPosition(), 500.0f))
 		{
 			if (m_bLastEdgeInPath)
 			{
@@ -93,7 +88,6 @@ EStatus GoalTraversePath::Process()
 			}
 
 			m_eStatus = EStatus::ES_Completed;
-			UE_LOG(LogTemp, Warning, TEXT("Path completed"));
 		}
 	}
 
@@ -112,5 +106,5 @@ void GoalTraversePath::Terminate()
 	 *
 	 */
 
-	m_pOwner->getSteeringBehaviors()->seekOff();
+	//m_pOwner->getSteeringBehaviors()->seekOff();
 }

@@ -50,9 +50,16 @@ FVector SteeringBehaviors::calculate() const
 	return seek(m_targetPosition) + flee(m_targetPosition) + arrive(m_targetPosition);
 }
 
+FVector SteeringBehaviors::getTargetPosition() const
+{
+	return m_targetPosition;
+}
+
 void SteeringBehaviors::setTargetPosition(FVector t_targetPosition)
 {
-	t_targetPosition = m_targetPosition;
+	UE_LOG(LogTemp, Warning, TEXT("Target position parameter: %s"), *t_targetPosition.ToString());
+	m_targetPosition = t_targetPosition;
+	UE_LOG(LogTemp, Warning, TEXT("Target position variable: %s"), *m_targetPosition.ToString());
 }
 
 void SteeringBehaviors::seekOn()

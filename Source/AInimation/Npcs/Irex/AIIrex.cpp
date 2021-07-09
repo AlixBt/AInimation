@@ -155,7 +155,7 @@ void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
 
 void AAIIrex::updateSteeringBehaviors()
 {
-	FVector steeringForce = m_steeringBehaviors->calculate();
+	/* FVector steeringForce = m_steeringBehaviors->calculate(); */
 	/* FVector acceleration = steeringForce / m_mass;
 	m_velocity += acceleration * GetWorld()->DeltaTimeSeconds;
 
@@ -164,11 +164,22 @@ void AAIIrex::updateSteeringBehaviors()
 		UKismetMathLibrary::ClampVectorSize(m_velocity, 0.0f, m_maxSpeed);
 	} */
 
-	FRotator nextRotation = steeringForce.ToOrientationRotator();
+	FVector npcPosition = FVector(m_npcCharacter->GetActorLocation().X,
+	                              m_npcCharacter->GetActorLocation().Y,
+								  0.0f);
+
+    FVector targetPosition = FVector(m_steeringBehaviors->getTargetPosition().X,
+	                                 m_steeringBehaviors->getTargetPosition().Y,
+								     0.0f);
+
+	FRotator nextRotation = UKismetMathLibrary::FindLookAtRotation(
+		                    npcPosition,
+							targetPosition);
+
 	m_npcCharacter->SetActorRotation(UKismetMathLibrary::RInterpTo(
 		                             m_npcCharacter->GetActorRotation(), nextRotation, 
 									 GetWorld()->DeltaTimeSeconds, 
-									 30.0f));
+									 0.8f));
 
 	m_npcCharacter->AddActorWorldOffset(m_npcCharacter->GetActorForwardVector() * 
 	                                    m_maxSpeed * GetWorld()->DeltaTimeSeconds);
