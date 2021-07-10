@@ -10,7 +10,6 @@
 #include "AIIrex.generated.h"
 
 class GoalThink;
-class SteeringBehaviors;
 
 /**
  * 
@@ -33,17 +32,8 @@ class AINIMATION_API AAIIrex : public AAIController
 	PathPlanner* m_pPathPlanner;
 	AACPath* m_path;
 
-	// Steering behaviors
-	SteeringBehaviors* m_steeringBehaviors;
-
-	FVector m_velocity { FVector::ZeroVector };
-	FVector m_forwardVector { FVector::ZeroVector };
-	FVector m_rightVector { FVector::ZeroVector };
-
-	const float m_mass { 5400.0f };
-	float m_maxSpeed { 0.0f };
-	const float m_maxForce{ 52920.0f };
-	const float m_maxTurnRate{ 10.0f };
+	// Path following
+	FVector m_targetPosition {FVector::ZeroVector};
 
 public:
 	// Constructor
@@ -62,19 +52,11 @@ public:
 	UNavigationSystemV1* getNavigationSystem() const;
 	AACPath* getPath() const;
 	bool getIsFollowingPath() const;
-
-	SteeringBehaviors* getSteeringBehaviors() const;
-
-	FVector getVelocity() const;
-	FVector getForwardVector() const;
-	FVector getRightVector() const;
-
-	float getMass() const;
-	float getMaxSpeed() const;
-	float getMaxForce() const;
-	float getMaxTurnRate() const;
+	FVector getTargetPosition() const;
 
 	// Setters
 	void setIsFollowingPath(bool t_bIsFollowingPath);
-	void updateSteeringBehaviors();
+	void setTargetPosition(FVector t_targetPosition);
+
+	void setMovementBehaviors(float t_deltaTime);
 };

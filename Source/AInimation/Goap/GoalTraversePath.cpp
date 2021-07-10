@@ -1,5 +1,5 @@
 #include "GoalTraversePath.h"
-#include "../AI/SteeringBehaviors.h"
+#include "DrawDebugHelpers.h"
 
 bool GoalTraversePath::NPCIsStuck() const
 {
@@ -50,17 +50,19 @@ void GoalTraversePath::Activate()
 	 * Set the steering behavior
 	 * 
 	 */
-	m_pOwner->getSteeringBehaviors()->setTargetPosition(m_pathEdge.GetDestinationPosition());
 
+	m_pOwner->setTargetPosition(m_pathEdge.GetDestinationPosition());
 
 	// Set the appropriate steering behavior. If it is the last edge,
 	// the NPC should arrive at the position, else it should seek
 	if (m_bLastEdgeInPath)
 	{
 		//m_pOwner->MoveToLocation(m_pathEdge.GetDestinationPosition(), 1.0f);
+		//m_pOwner->MoveToLocation(m_pathEdge.GetDestinationPosition(), 1.0f);
 	}
 	else
 	{
+		//m_pOwner->MoveToLocation(m_pathEdge.GetDestinationPosition(), 1.0f);
 		//m_pOwner->MoveToLocation(m_pathEdge.GetDestinationPosition(), 1.0f);
 	}
 }
@@ -79,7 +81,7 @@ EStatus GoalTraversePath::Process()
 	else*/
 	{
 		// We check if the NPC is at destination with a radius of 50.0f
-		if (m_pOwner->GetNPC()->GetActorLocation().Equals(m_pathEdge.GetDestinationPosition(), 500.0f))
+		if (m_pOwner->GetNPC()->GetActorLocation().Equals(m_pathEdge.GetDestinationPosition(), 450.0f))
 		{
 			if (m_bLastEdgeInPath)
 			{
@@ -105,6 +107,4 @@ void GoalTraversePath::Terminate()
 	 * Set the NPC's speed
 	 *
 	 */
-
-	//m_pOwner->getSteeringBehaviors()->seekOff();
 }

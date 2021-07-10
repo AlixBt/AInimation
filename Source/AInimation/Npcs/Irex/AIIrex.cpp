@@ -4,7 +4,6 @@
 #include "DrawDebugHelpers.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "../../Goap/GoalThink.h"
-#include "../../AI/SteeringBehaviors.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
@@ -16,7 +15,6 @@ AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
 {
 	// Initialization
 	m_pPathPlanner = new PathPlanner(this);
-	m_steeringBehaviors = new SteeringBehaviors(this);
 }
 
 void AAIIrex::BeginPlay()
@@ -68,12 +66,9 @@ void AAIIrex::Tick(float p_deltaTime)
 
 		if (m_brain != nullptr)
 		{
-			updateSteeringBehaviors();
-
+			setMovementBehaviors(p_deltaTime);
 			m_brain->arbitrate();
 			EStatus status = m_brain->Process();
-			GEngine->AddOnScreenDebugMessage(0, -1.0f, FColor::Red, FString::Printf(TEXT("Index: %i"), m_path->GetPathIndex()));
-			GEngine->AddOnScreenDebugMessage(1, -1.0f, FColor::Yellow, FString::Printf(TEXT("Is following a path: %s"), m_bIsFollowingPath ? TEXT("true") : TEXT("false")));
 		}
 	}
 }
@@ -108,44 +103,9 @@ bool AAIIrex::getIsFollowingPath() const
 	return m_bIsFollowingPath;
 }
 
-SteeringBehaviors* AAIIrex::getSteeringBehaviors() const
+FVector AAIIrex::getTargetPosition() const
 {
-	return m_steeringBehaviors;
-}
-
-FVector AAIIrex::getVelocity() const
-{
-	return m_velocity;
-}
-
-FVector AAIIrex::getForwardVector() const
-{
-	return m_forwardVector;
-}
-
-FVector AAIIrex::getRightVector() const
-{
-	return m_rightVector;
-}
-
-float AAIIrex::getMass() const
-{
-	return m_mass;
-}
-
-float AAIIrex::getMaxSpeed() const
-{
-	return m_maxSpeed;
-}
-
-float AAIIrex::getMaxForce() const
-{
-	return m_maxForce;
-}
-
-float AAIIrex::getMaxTurnRate() const
-{
-	return m_maxTurnRate;
+	return m_targetPosition;
 }
 
 void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
@@ -153,42 +113,32 @@ void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
 	m_bIsFollowingPath = t_bIsFollowingPath;
 }
 
-void AAIIrex::updateSteeringBehaviors()
+void AAIIrex::setTargetPosition(FVector t_targetPosition)
 {
-	/* FVector steeringForce = m_steeringBehaviors->calculate(); */
-	/* FVector acceleration = steeringForce / m_mass;
-	m_velocity += acceleration * GetWorld()->DeltaTimeSeconds;
+	m_targetPosition = t_targetPosition;
+}
 
-	if (m_velocity.Size() > m_maxSpeed)
-	{
-		UKismetMathLibrary::ClampVectorSize(m_velocity, 0.0f, m_maxSpeed);
-	} */
-
-	FVector npcPosition = FVector(m_npcCharacter->GetActorLocation().X,
+void AAIIrex::setMovementBehaviors(float t_deltaTime)
+{
+	FVector NPCPosition = FVector(m_npcCharacter->GetActorLocation().X,
 	                              m_npcCharacter->GetActorLocation().Y,
 								  0.0f);
 
-    FVector targetPosition = FVector(m_steeringBehaviors->getTargetPosition().X,
-	                                 m_steeringBehaviors->getTargetPosition().Y,
-								     0.0f);
+	FVector NPCForwardVector = m_npcCharacter->GetActorForwardVector();
+	float NPCMaxWalkSpeed = m_npcCharacter->GetCharacterMovement()->MaxWalkSpeed;
 
-	FRotator nextRotation = UKismetMathLibrary::FindLookAtRotation(
-		                    npcPosition,
-							targetPosition);
-
+	FRotator nextNPCRotation = UKismetMathLibrary::FindLookAtRotation(NPCPosition, m_targetPosition);
 	m_npcCharacter->SetActorRotation(UKismetMathLibrary::RInterpTo(
-		                             m_npcCharacter->GetActorRotation(), nextRotation, 
-									 GetWorld()->DeltaTimeSeconds, 
-									 0.8f));
+		m_npcCharacter->GetActorRotation(),
+		nextNPCRotation,
+		t_deltaTime,
+		1.2f
+	));
 
-	m_npcCharacter->AddActorWorldOffset(m_npcCharacter->GetActorForwardVector() * 
-	                                    m_maxSpeed * GetWorld()->DeltaTimeSeconds);
-
-	if (m_velocity.Size() > 0.00000001f)
-	{
-		m_forwardVector = m_velocity.GetSafeNormal(1.0f);
-		m_rightVector = m_forwardVector.RightVector;
-	}
-
-	m_maxSpeed = m_npcCharacter->GetCharacterMovement()->MaxWalkSpeed;
+	// We add a translation forward to the NPC
+	m_npcCharacter->SetActorLocation(
+		m_npcCharacter->GetActorLocation() + 
+		(NPCForwardVector * NPCMaxWalkSpeed)
+		* t_deltaTime
+	);
 }

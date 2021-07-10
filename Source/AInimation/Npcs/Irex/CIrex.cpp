@@ -1,6 +1,7 @@
 #include "CIrex.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ACIrex::ACIrex()
@@ -30,6 +31,5 @@ void ACIrex::BeginPlay()
 void ACIrex::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
