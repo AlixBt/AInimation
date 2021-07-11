@@ -17,6 +17,10 @@ class AINIMATION_API PathEdge
 {
 	FVector m_vSourcePosition;
 	FVector m_vDestinationPosition;
+	FVector m_nextSourcePosition {FVector::ZeroVector};
+
+	FVector m_firstControlPoint {FVector::ZeroVector};
+	FVector m_secondControlPoint {FVector::ZeroVector};
 
 	EBehaviorType m_eBehavior;
 
@@ -32,4 +36,8 @@ public:
 	// Setters
 	void SetSourcePosition(FVector p_vSourcePosition);
 	void SetDestinationPosition(FVector p_vDestinationPosition);
+	void setNextSourcePosition(FVector t_nextSourcePosition);
+
+	void setFirstControlPoint(FVector t_firstControlPoint);
+	void setSecondControlPoint(FVector t_secondControlPoint);
 };

@@ -2,6 +2,9 @@
 #include "DrawDebugHelpers.h"
 #include "Algo/Reverse.h"
 #include "Kismet/KismetMathLibrary.h"
+#include  "../Npcs/Irex/AIIrex.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "../Utility/MathUtility.h"
 
 Node PathFinder::GetLowestFCostNode(TArray<Node> p_aOpenList) const
 {
@@ -325,9 +328,58 @@ TArray<PathEdge> PathFinder::ConvertPath(TArray<FVector> p_aPath) const
 	{
 		for (int i = 0; i < p_aPath.Num() - 1; i++)
 		{
-			aPathEdge.Add(PathEdge(p_aPath[i], p_aPath[i + 1], EBehaviorType::EBT_Normal));
+			PathEdge pathEdgeToAdd = PathEdge(p_aPath[i], p_aPath[i + 1], EBehaviorType::EBT_Normal);
+
+			if ( (i + 2) <= p_aPath.Num() - 1)
+			{
+				pathEdgeToAdd.setNextSourcePosition(p_aPath[i + 2]);
+			}
+
+			aPathEdge.Add(pathEdgeToAdd);
 		}
 	}
 
 	return aPathEdge;
+}
+
+TArray<FVector> PathFinder::createControlPoints(PathEdge t_roughPathEdge, AAIIrex* t_owner, bool t_bLastInPath) const
+{
+	// We add the first control point to the array
+	TArray<FVector> controlPoints;
+	FVector startPoint = t_roughPathEdge.GetSourcePosition();
+	FVector endPoint = t_roughPathEdge.GetDestinationPosition();
+	controlPoints.Add(startPoint);
+
+	// The calculation of the middle control points are different
+	// if the path edge is the last on the path or not
+	if (t_bLastInPath)
+	{
+		// We calculate the first based on the forward vector
+		// of the NPC and its walk speed
+		FVector actorForwardVector = t_owner->GetNPC()->GetActorForwardVector();
+		float maxWalkSpeed = t_owner->GetNPC()->GetCharacterMovement()->MaxWalkSpeed;
+		
+		// We compute the orthogonal to the path edge
+		FVector directionalVector = (endPoint - startPoint);
+		FVector orthogonalVector = MathUtility::getOrthogonal2D(directionalVector).GetSafeNormal(1.0f);
+
+		if (FVector::DotProduct(actorForwardVector, orthogonalVector) < 0.0f)
+		{
+			orthogonalVector = -orthogonalVector;
+		}
+
+		// We set the both control points
+		t_roughPathEdge.setFirstControlPoint(startPoint + actorForwardVector * maxWalkSpeed);
+		FVector mirrorActorForwardVector = actorForwardVector.MirrorByVector(orthogonalVector);
+		mirrorActorForwardVector = -mirrorActorForwardVector;
+		t_roughPathEdge.setSecondControlPoint(endPoint + mirrorActorForwardVector * maxWalkSpeed);
+
+		t_owner->startPoint = startPoint;
+		t_owner->firstControlPoint = startPoint + actorForwardVector * maxWalkSpeed;
+		t_owner->endPoint = endPoint;
+		t_owner->secondControlPoint = endPoint + mirrorActorForwardVector * maxWalkSpeed;
+	}
+
+
+	return controlPoints;
 }

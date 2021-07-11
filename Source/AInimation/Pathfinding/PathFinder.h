@@ -6,6 +6,8 @@
 #include "Node.h"
 #include "PathEdge.h"
 
+class AAIIrex;
+
 /**
  * 
  */
@@ -33,4 +35,6 @@ public:
 	void ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const;
 	void SmoothPath(TArray<FVector>& p_aRoughPath) const;
 	TArray<PathEdge> ConvertPath(TArray<FVector> p_aPath) const;
+
+	TArray<FVector> createControlPoints(PathEdge t_roughPathEdge, AAIIrex* t_owner, bool t_bLastInPath) const;
 };

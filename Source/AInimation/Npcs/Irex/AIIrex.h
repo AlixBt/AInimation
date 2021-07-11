@@ -59,4 +59,11 @@ public:
 	void setTargetPosition(FVector t_targetPosition);
 
 	void setMovementBehaviors(float t_deltaTime);
+
+	// TEST
+	FVector startPoint;
+	FVector endPoint;
+	FVector firstControlPoint;
+	FVector secondControlPoint;
+	FVector orthogonalVector;
 };

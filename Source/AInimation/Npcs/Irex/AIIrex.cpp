@@ -69,6 +69,9 @@ void AAIIrex::Tick(float p_deltaTime)
 			setMovementBehaviors(p_deltaTime);
 			m_brain->arbitrate();
 			EStatus status = m_brain->Process();
+
+			DrawDebugLine(GetWorld(), startPoint, firstControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
+			DrawDebugLine(GetWorld(), endPoint, secondControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
 		}
 	}
 }

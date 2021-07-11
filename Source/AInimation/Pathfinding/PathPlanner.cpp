@@ -67,6 +67,7 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<PathEdg
 	if (!aPathNodes.IsEmpty())
 	{
 		p_aPath = pPathFinder->FunnelAlgorithm(m_pOwner->GetWorld(), aPathNodes, vStartPosition, p_vTargetPosition);
+		pPathFinder->createControlPoints(p_aPath[0], m_pOwner, true);
 	}
 
 	return false;
