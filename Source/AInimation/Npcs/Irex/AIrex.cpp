@@ -20,9 +20,9 @@ void UAIrex::NativeInitializeAnimation()
 		return;
 	}
 
-	if (owner->IsA(ACIrex::StaticClass()))
+	if (owner->IsA(AIrex::StaticClass()))
 	{
-		m_npcCharacter = Cast<ACIrex>(owner);
+		m_npcCharacter = Cast<AIrex>(owner);
 	}
 }
 

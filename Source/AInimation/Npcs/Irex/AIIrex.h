@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "CIrex.h"
+#include "Irex.h"
 #include "AIrex.h"
 #include "../../ACPath.h"
 #include "NavigationSystem.h"
@@ -24,7 +24,7 @@ class AINIMATION_API AAIIrex : public AAIController
 	bool m_bIsFollowingPath{ false };
 
 	// Utility
-	ACIrex* m_npcCharacter;
+	AIrex* m_npcCharacter;
 	UAIrex* m_npcAnimInstance;
 	UNavigationSystemV1* m_pNavigationSystem;
 
@@ -34,6 +34,7 @@ class AINIMATION_API AAIIrex : public AAIController
 
 	// Path following
 	FVector m_targetPosition {FVector::ZeroVector};
+	float m_turnRate {120.0f};
 
 public:
 	// Constructor
@@ -46,17 +47,19 @@ public:
 
 	// Getters
 	bool GetPreyIsFound() const;
-	ACIrex* GetNPC() const;
+	AIrex* GetNPC() const;
 	GoalThink* getBrain() const;
 	PathPlanner* getPathPlanner() const;
 	UNavigationSystemV1* getNavigationSystem() const;
 	AACPath* getPath() const;
 	bool getIsFollowingPath() const;
 	FVector getTargetPosition() const;
+	float getTurnRate() const;
 
 	// Setters
 	void setIsFollowingPath(bool t_bIsFollowingPath);
 	void setTargetPosition(FVector t_targetPosition);
+	void setTurnRate(float t_turnRate);
 
 	void setMovementBehaviors(float t_deltaTime);
 
@@ -65,5 +68,6 @@ public:
 	FVector endPoint;
 	FVector firstControlPoint;
 	FVector secondControlPoint;
-	FVector orthogonalVector;
+	FVector lastVectorStartPoint;
+	FVector lastVectorEndPoint;
 };

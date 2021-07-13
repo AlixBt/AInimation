@@ -35,18 +35,3 @@ void PathEdge::SetDestinationPosition(FVector p_vDestinationPosition)
 {
 	m_vDestinationPosition = p_vDestinationPosition;
 }
-
-void PathEdge::setNextSourcePosition(FVector t_nextSourcePosition)
-{
-	m_nextSourcePosition = t_nextSourcePosition;
-}
-
-void PathEdge::setFirstControlPoint(FVector t_firstControlPoint)
-{
-	m_firstControlPoint = t_firstControlPoint;
-}
-
-void PathEdge::setSecondControlPoint(FVector t_secondControlPoint)
-{
-	m_secondControlPoint = t_secondControlPoint;
-}

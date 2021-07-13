@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "CIrex.h"
+#include "Irex.h"
 #include "AIrex.generated.h"
 
 /**
@@ -14,7 +14,7 @@ class AINIMATION_API UAIrex : public UAnimInstance
 	GENERATED_BODY()
 	
 	// Utility
-	ACIrex* m_npcCharacter;
+	AIrex* m_npcCharacter;
 
 public:
 	// Constructor

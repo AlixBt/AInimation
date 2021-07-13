@@ -36,5 +36,8 @@ public:
 	void SmoothPath(TArray<FVector>& p_aRoughPath) const;
 	TArray<PathEdge> ConvertPath(TArray<FVector> p_aPath) const;
 
-	TArray<FVector> createControlPoints(PathEdge t_roughPathEdge, AAIIrex* t_owner, bool t_bLastInPath) const;
+	TArray<FVector> createControlPoints(PathEdge t_roughPathEdge, AAIIrex* t_owner, bool t_bOneInPath, FVector lastDirectionalVector) const;
+	TArray<PathEdge> bezierSmoothing(TArray<PathEdge> t_roughPath, AAIIrex* t_owner) const;
+	void cubicCurve(TArray<FVector>& t_pathVectorPoints, TArray<FVector> t_controlPoints, bool t_bFirstEdge) const;
+	FVector adjustDirectionalVector(FVector t_startDirection, FVector t_startPoint, FVector t_endPoint, float t_turnRate) const;
 };

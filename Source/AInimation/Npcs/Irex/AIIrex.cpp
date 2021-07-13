@@ -45,9 +45,9 @@ void AAIIrex::OnPossess(APawn* const p_pawn)
 	Super::OnPossess(p_pawn);
 
 	// We use p_pawn to cast to the corresponding class
-	if (p_pawn->IsA(ACIrex::StaticClass()))
+	if (p_pawn->IsA(AIrex::StaticClass()))
 	{
-		m_npcCharacter = Cast<ACIrex>(p_pawn);
+		m_npcCharacter = Cast<AIrex>(p_pawn);
 
 		if (m_npcCharacter)
 		{
@@ -72,11 +72,14 @@ void AAIIrex::Tick(float p_deltaTime)
 
 			DrawDebugLine(GetWorld(), startPoint, firstControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
 			DrawDebugLine(GetWorld(), endPoint, secondControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
+			DrawDebugLine(GetWorld(), lastVectorStartPoint, lastVectorEndPoint, FColor::Green, false, -1.0f, 0, 5.0f);
+
+			//DrawDebugBox(GetWorld(), orthogonalVector, FVector(25.0f, 25.0f, 25.0f), FColor::Green);
 		}
 	}
 }
 
-ACIrex* AAIIrex::GetNPC() const
+AIrex* AAIIrex::GetNPC() const
 {
 	return m_npcCharacter;
 }
@@ -111,6 +114,11 @@ FVector AAIIrex::getTargetPosition() const
 	return m_targetPosition;
 }
 
+float AAIIrex::getTurnRate() const
+{
+	return m_turnRate;
+}
+
 void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
 {
 	m_bIsFollowingPath = t_bIsFollowingPath;
@@ -119,6 +127,11 @@ void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
 void AAIIrex::setTargetPosition(FVector t_targetPosition)
 {
 	m_targetPosition = t_targetPosition;
+}
+
+void AAIIrex::setTurnRate(float t_turnRate)
+{
+	m_turnRate = t_turnRate;
 }
 
 void AAIIrex::setMovementBehaviors(float t_deltaTime)
