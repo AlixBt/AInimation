@@ -28,16 +28,11 @@ public:
 	TArray<NavNodeRef> RetracePath(Node p_startNode, Node p_targetNode, TArray<Node> p_aClosedList) const;
 	TArray<Node> GetNodeNeighbours(NavNodeRef p_nodeRef) const;
 
-	TArray<PathEdge> FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const;
+	TArray<PathEdge> FunnelAlgorithm(AAIIrex* t_owner, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const;
 	TArray<FNavigationPortalEdge> FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const;
 	float Triarea2(FVector p_vApex, FVector p_vCurrentVector, FVector p_vCandidateVector) const;
 	bool EqualDistance(FVector p_vCurrent, FVector p_vToCheck) const;
 	void ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const;
 	void SmoothPath(TArray<FVector>& p_aRoughPath) const;
-	TArray<PathEdge> ConvertPath(TArray<FVector> p_aPath) const;
-
-	TArray<FVector> createControlPoints(PathEdge t_roughPathEdge, AAIIrex* t_owner, bool t_bOneInPath, FVector lastDirectionalVector) const;
-	TArray<PathEdge> bezierSmoothing(TArray<PathEdge> t_roughPath, AAIIrex* t_owner) const;
-	void cubicCurve(TArray<FVector>& t_pathVectorPoints, TArray<FVector> t_controlPoints, bool t_bFirstEdge) const;
-	FVector adjustDirectionalVector(FVector t_startDirection, FVector t_startPoint, FVector t_endPoint, float t_turnRate) const;
+	TArray<PathEdge> ConvertPath(TArray<FVector> p_aPath, FVector t_actorForwardVector) const;
 };

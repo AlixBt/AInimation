@@ -3,7 +3,7 @@
 #include "ExploreGoalEvaluator.h"
 #include "NavigationSystem.h"
 #include "../Pathfinding/PathPlanner.h"
-#include "../ACPath.h"
+#include "../Utility/CartTarget.h"
 #include "DrawDebugHelpers.h"
 
 GoalThink::GoalThink(AAIIrex* p_pOwner) :
@@ -68,8 +68,8 @@ void GoalThink::arbitrate()
 void GoalThink::addGoalExplore()
 {
 	// We choose an arbitrary position on the navmesh
-	AACPath* path = m_pOwner->getPath();
-	FVector worldPoint = path->GetTransform().TransformPosition(path->GetPathPoint());
+	ACartTarget* target = m_pOwner->getPath();
+	FVector worldPoint = target->GetActorLocation();
 	
 	if (!m_pOwner->getIsFollowingPath())
 	{

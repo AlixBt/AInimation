@@ -141,7 +141,7 @@ TArray<Node> PathFinder::GetNodeNeighbours(NavNodeRef p_nodeRef) const
 	return TArray<Node>();
 }
 
-TArray<PathEdge> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const
+TArray<PathEdge> PathFinder::FunnelAlgorithm(AAIIrex* t_owner, TArray<NavNodeRef> p_aPathNodes, FVector p_vStartPosition, FVector p_vTargetPosition) const
 {
 	TArray<FNavigationPortalEdge> aPathPortals = FindPortalsFromPath(p_aPathNodes);
 	TArray<FVector> aProcessPath;
@@ -221,7 +221,7 @@ TArray<PathEdge> PathFinder::FunnelAlgorithm(UWorld* p_pWorld, TArray<NavNodeRef
 		SmoothPath(aProcessPath);
 	}
 
-	return ConvertPath(aProcessPath);
+	return ConvertPath(aProcessPath, t_owner->GetNPC()->GetActorForwardVector());
 }
 
 TArray<FNavigationPortalEdge> PathFinder::FindPortalsFromPath(TArray<NavNodeRef> p_aPathNodes) const
@@ -321,7 +321,7 @@ void PathFinder::SmoothPath(TArray<FVector>& p_aRoughPath) const
 	}
 }
 
-TArray<PathEdge> PathFinder::ConvertPath(TArray<FVector> p_aPath) const
+TArray<PathEdge> PathFinder::ConvertPath(TArray<FVector> p_aPath, FVector t_actorForwardVector) const
 {
 	TArray<PathEdge> aPathEdge;
 
@@ -329,228 +329,19 @@ TArray<PathEdge> PathFinder::ConvertPath(TArray<FVector> p_aPath) const
 	{
 		for (int i = 0; i < p_aPath.Num() - 1; i++)
 		{
-			aPathEdge.Add(PathEdge(p_aPath[i], p_aPath[i + 1], EBehaviorType::EBT_Normal));
+			PathEdge pathEdgeToAdd = PathEdge(p_aPath[i], p_aPath[i + 1], EBehaviorType::EBT_Normal);
+
+			if (i < p_aPath.Num() - 2)
+			{
+				FVector firstDirectionalVector = FVector(p_aPath[i] - p_aPath[i + 1]).GetSafeNormal(1.0f);
+				FVector secondDirectionalVector = FVector(p_aPath[i + 2] - p_aPath[i + 1]).GetSafeNormal(1.0f);
+
+				//pathEdgeToAdd.setDirectionToNext(FVector::DotProduct(firstDirectionalVector, secondDirectionalVector));
+			}
+
+			aPathEdge.Add(pathEdgeToAdd);
 		}
 	}
 
 	return aPathEdge;
-}
-
-TArray<FVector> PathFinder::createControlPoints(PathEdge t_roughPathEdge, AAIIrex* t_owner, bool t_bOneInPath, FVector lastDirectionalVector) const
-{
-	// We add the first control point to the array
-	TArray<FVector> controlPoints;
-	FVector startPoint = t_roughPathEdge.GetSourcePosition();
-	FVector endPoint = t_roughPathEdge.GetDestinationPosition();
-	FVector directionalEdgeVector = FVector(startPoint - endPoint).GetSafeNormal(1.0f);
-	controlPoints.Add(startPoint);
-
-	// We took care of the exception: only one edge on the path
-	FVector actorForwardVector = t_owner->GetNPC()->GetActorForwardVector();
-	float maxWalkSpeed = t_owner->GetNPC()->GetCharacterMovement()->MaxWalkSpeed;
-	FVector secondControlPoint = startPoint + actorForwardVector * maxWalkSpeed;
-
-	if (t_bOneInPath && lastDirectionalVector == FVector::ZeroVector)
-	{
-		// We add the second control point based on the speed and forward vector of the NPC
-		controlPoints.Add(secondControlPoint);
-
-		// We calculate the third control point based on the turning radius of the NPC and distance to cover
-		actorForwardVector = adjustDirectionalVector(actorForwardVector, startPoint, endPoint, t_owner->getTurnRate());
-
-		FVector thirdControlPoint = endPoint + actorForwardVector * maxWalkSpeed;
-		FVector firstDirectionalVector = FVector(controlPoints[1] - startPoint).GetSafeNormal(1.0f);
-		FVector secondDirectionalVector = (thirdControlPoint - endPoint).GetSafeNormal(1.0f);
-		controlPoints.Add(thirdControlPoint);
-
-		float dotProduct = FVector::DotProduct(firstDirectionalVector, secondDirectionalVector);
-
-		UE_LOG(LogTemp, Warning, TEXT("Dot product: %f"), dotProduct);
-
-		controlPoints.Add(endPoint);
-	}
-
-	if (!t_bOneInPath && lastDirectionalVector == FVector::ZeroVector)
-	{
-		// We add the second control point based on the speed and forward vector of the NPC
-		controlPoints.Add(secondControlPoint);
-
-		// We calculate the third control point based on the turning radius of the NPC and distance to cover
-		actorForwardVector = adjustDirectionalVector(actorForwardVector, startPoint, endPoint, t_owner->getTurnRate());
-		FVector thirdControlPoint = endPoint + actorForwardVector * maxWalkSpeed;
-		controlPoints.Add(thirdControlPoint);
-
-		// We add the fourth control point
-		controlPoints.Add(endPoint);
-
-		// We add the directional vector of the destination point for the next source point
-		controlPoints.Add(FVector(controlPoints[2] - controlPoints[3]).GetSafeNormal(1.0f));
-		UE_LOG(LogTemp, Warning, TEXT("i == 0"));
-	}
-
-	if (!t_bOneInPath && lastDirectionalVector != FVector::ZeroVector)
-	{
-		// We add the second control point based on the speed of the NPC and the last directional vector
-		lastDirectionalVector = -lastDirectionalVector;
-		UE_LOG(LogTemp, Warning, TEXT("last vector: %s"), *lastDirectionalVector.ToString());
-		secondControlPoint = startPoint + lastDirectionalVector * maxWalkSpeed;
-		controlPoints.Add(secondControlPoint);
-
-		// We calculate the third control point based on the turning radius of the NPC and distance to cover
-		actorForwardVector = adjustDirectionalVector(actorForwardVector, startPoint, endPoint, t_owner->getTurnRate());
-		FVector thirdControlPoint = endPoint + actorForwardVector * maxWalkSpeed;
-		controlPoints.Add(thirdControlPoint);
-
-		// We add the fourth control point
-		controlPoints.Add(endPoint);
-
-		// We add the directional vector of the destination point for the next source point
-		controlPoints.Add(FVector(controlPoints[2] - controlPoints[3]).GetSafeNormal(1.0f));
-	}
-
-	t_owner->startPoint = controlPoints[0];
-	t_owner->firstControlPoint = controlPoints[1];
-	t_owner->secondControlPoint = controlPoints[2];
-	t_owner->endPoint = controlPoints[3];
-
-	return controlPoints;
-}
-
-TArray<PathEdge> PathFinder::bezierSmoothing(TArray<PathEdge> t_roughPath, AAIIrex* t_owner) const
-{
-	TArray<FVector> controlPoints;
-	TArray<FVector> pathVectorPoints;
-	TArray<PathEdge> pathEdgePoints;
-
-	// First, we create the control points
-	for (int i = 0; i < t_roughPath.Num(); i++)
-	{
-		// Exception if there is only on edge in the path
-		if (0 == t_roughPath.Num() - 1)
-		{
-			controlPoints = createControlPoints(t_roughPath[i], t_owner, true, FVector::ZeroVector);
-			cubicCurve(pathVectorPoints, controlPoints, true);
-			pathEdgePoints = ConvertPath(pathVectorPoints);
-			break;
-		}
-
-		if (i == 0)
-		{
-			controlPoints = createControlPoints(t_roughPath[i], t_owner, false, FVector::ZeroVector);
-			cubicCurve(pathVectorPoints, controlPoints, true);
-		}
-		else
-		{
-			controlPoints = createControlPoints(t_roughPath[i], t_owner, false, controlPoints[4]);		
-			cubicCurve(pathVectorPoints, controlPoints, false);
-
-			if (i == t_roughPath.Num() - 1)
-			{
-				pathEdgePoints = ConvertPath(pathVectorPoints);
-			}
-		} 
-	}
-
-	return pathEdgePoints;
-}
-
-void PathFinder::cubicCurve(TArray<FVector>& t_pathVectorPoints, TArray<FVector> t_controlPoints, bool t_bFirstEdge) const
-{
-	// We get some points on the curve based on the cubic curve formula
-	FVector firstControlPoint = t_controlPoints[0];
-	FVector secondControlPoint = t_controlPoints[1];
-	FVector thirdControlPoint = t_controlPoints[2];
-	FVector fourthControlPoint = t_controlPoints[3];
-
-	// If it is the first edge, we add the start point to the array
-	if (t_bFirstEdge)
-	{
-		t_pathVectorPoints.Add(firstControlPoint);
-
-		for (double i = 0.1; i < 1; i += 0.1)
-		{
-			float x = FMath::Pow((1 - i), 3) * firstControlPoint.X + 
-			          3 * FMath::Pow((1 - i), 2) * i * secondControlPoint.X +
-					  3 * FMath::Pow((1 - i), 2) * i * thirdControlPoint.X +
-					  FMath::Pow(i, 3) * fourthControlPoint.X;
-
-			float y = FMath::Pow((1 - i), 3) * firstControlPoint.Y + 
-			          3 * FMath::Pow((1 - i), 2) * i * secondControlPoint.Y +
-					  3 * FMath::Pow((1 - i), 2) * i * thirdControlPoint.Y +
-					  FMath::Pow(i, 3) * fourthControlPoint.Y;
-
-			t_pathVectorPoints.Add(FVector(x, y, 0.0f));
-		}
-
-		t_pathVectorPoints.Add(fourthControlPoint);
-	}
-	else
-	{
-		for (double i = 0.2; i < 1; i += 0.2)
-		{
-			float x = FMath::Pow((1 - i), 3) * firstControlPoint.X + 
-			          3 * FMath::Pow((1 - i), 2) * i * secondControlPoint.X +
-					  3 * FMath::Pow((1 - i), 2) * i * thirdControlPoint.X +
-					  FMath::Pow(i, 3) * fourthControlPoint.X;
-
-			float y = FMath::Pow((1 - i), 3) * firstControlPoint.Y + 
-			          3 * FMath::Pow((1 - i), 2) * i * secondControlPoint.Y +
-					  3 * FMath::Pow((1 - i), 2) * i * thirdControlPoint.Y +
-					  FMath::Pow(i, 3) * fourthControlPoint.Y;
-
-			t_pathVectorPoints.Add(FVector(x, y, 0.0f));
-		}
-
-		t_pathVectorPoints.Add(fourthControlPoint);
-	}
-}
-
-FVector PathFinder::adjustDirectionalVector(FVector t_startDirection, FVector t_startPoint, FVector t_endPoint, float t_turnRate) const
-{
-	float startPointX = t_startPoint.X;
-	float startPointY = t_startPoint.Y;
-
-	float endPointX = t_endPoint.X;
-	float endPointY = t_endPoint.Y;
-
-	if ((endPointX >= (startPointX - t_turnRate) && endPointX <= (startPointX + t_turnRate)) || 
-	    (endPointY >= (startPointY - t_turnRate) && endPointY <= (startPointY + t_turnRate)))
-	{
-		FVector endDirection = MathUtility::getCrossProductVector2D(t_startDirection, 0.38f).GetSafeNormal(1.0f);
-
-		if (FVector::DotProduct(t_startDirection, endDirection) >= 0.0f)
-		{
-			return -endDirection;
-		}
-
-		return endDirection;
-	}
-
-	if (endPointX <= (startPointX - t_turnRate) || 
-	    endPointY <= (startPointY - t_turnRate))
-	{
-		FVector endDirection = MathUtility::getCrossProductVector2D(t_startDirection, 0.71f).GetSafeNormal(1.0f);
-
-		if (FVector::DotProduct(t_startDirection, endDirection) <= 0.0f)
-		{
-			return -endDirection;
-		}
-
-		return endDirection;
-	}
-
-	if (endPointX >= (startPointX - t_turnRate) || 
-	    endPointY >= (startPointY - t_turnRate))
-	{
-		FVector endDirection = MathUtility::getCrossProductVector2D(t_startDirection, -0.71f).GetSafeNormal(1.0f);
-
-		if (FVector::DotProduct(t_startDirection, endDirection) <= 0.0f)
-		{
-			return -endDirection;
-		}
-
-		return endDirection;
-	}
-
-	return FVector::ZeroVector;
 }

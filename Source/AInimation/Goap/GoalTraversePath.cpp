@@ -85,7 +85,7 @@ EStatus GoalTraversePath::Process()
 		{
 			if (m_bLastEdgeInPath)
 			{
-				m_pOwner->getPath()->IncrementPathIndex();
+				//m_pOwner->getPath()->IncrementPathIndex();
 				m_pOwner->setIsFollowingPath(false);
 			}
 

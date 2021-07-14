@@ -11,7 +11,7 @@ AAIIrex::AAIIrex(FObjectInitializer const& p_objectInitializer) :
 	m_npcCharacter(nullptr),
 	m_npcAnimInstance(nullptr),
 	m_pNavigationSystem(nullptr),
-	m_path(nullptr)
+	m_target(nullptr)
 {
 	// Initialization
 	m_pPathPlanner = new PathPlanner(this);
@@ -23,11 +23,11 @@ void AAIIrex::BeginPlay()
 
 	// Catch the path for later use
 	TArray<AActor*> OutActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AACPath::StaticClass(), OutActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACartTarget::StaticClass(), OutActors);
 
 	if (OutActors.Num() > 0)
 	{
-		m_path = Cast<AACPath>(OutActors[0]);
+		m_target = Cast<ACartTarget>(OutActors[0]);
 		UE_LOG(LogTemp, Warning, TEXT("AAIIrex::BeginPlay - Path catch"));
 	}
 
@@ -67,12 +67,11 @@ void AAIIrex::Tick(float p_deltaTime)
 		if (m_brain != nullptr)
 		{
 			setMovementBehaviors(p_deltaTime);
-			m_brain->arbitrate();
+			m_brain->arbitrate();			
 			EStatus status = m_brain->Process();
-
-			DrawDebugLine(GetWorld(), startPoint, firstControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
-			DrawDebugLine(GetWorld(), endPoint, secondControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
-			DrawDebugLine(GetWorld(), lastVectorStartPoint, lastVectorEndPoint, FColor::Green, false, -1.0f, 0, 5.0f);
+			//DrawDebugLine(GetWorld(), startPoint, firstControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
+			//DrawDebugLine(GetWorld(), endPoint, secondControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
+			//DrawDebugLine(GetWorld(), lastVectorStartPoint, lastVectorEndPoint, FColor::Green, false, -1.0f, 0, 5.0f);
 
 			//DrawDebugBox(GetWorld(), orthogonalVector, FVector(25.0f, 25.0f, 25.0f), FColor::Green);
 		}
@@ -99,9 +98,9 @@ UNavigationSystemV1* AAIIrex::getNavigationSystem() const
 	return m_pNavigationSystem;
 }
 
-AACPath* AAIIrex::getPath() const
+ACartTarget* AAIIrex::getPath() const
 {
-	return m_path;
+	return m_target;
 }
 
 bool AAIIrex::getIsFollowingPath() const

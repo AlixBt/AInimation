@@ -4,7 +4,7 @@
 #include "AIController.h"
 #include "Irex.h"
 #include "AIrex.h"
-#include "../../ACPath.h"
+#include "../../Utility/CartTarget.h"
 #include "NavigationSystem.h"
 #include "../../Pathfinding/PathPlanner.h"
 #include "AIIrex.generated.h"
@@ -30,7 +30,7 @@ class AINIMATION_API AAIIrex : public AAIController
 
 	// PathFinding
 	PathPlanner* m_pPathPlanner;
-	AACPath* m_path;
+	ACartTarget* m_target;
 
 	// Path following
 	FVector m_targetPosition {FVector::ZeroVector};
@@ -51,7 +51,7 @@ public:
 	GoalThink* getBrain() const;
 	PathPlanner* getPathPlanner() const;
 	UNavigationSystemV1* getNavigationSystem() const;
-	AACPath* getPath() const;
+	ACartTarget* getPath() const;
 	bool getIsFollowingPath() const;
 	FVector getTargetPosition() const;
 	float getTurnRate() const;
@@ -62,12 +62,4 @@ public:
 	void setTurnRate(float t_turnRate);
 
 	void setMovementBehaviors(float t_deltaTime);
-
-	// TEST
-	FVector startPoint;
-	FVector endPoint;
-	FVector firstControlPoint;
-	FVector secondControlPoint;
-	FVector lastVectorStartPoint;
-	FVector lastVectorEndPoint;
 };

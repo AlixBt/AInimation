@@ -21,6 +21,11 @@ FVector PathEdge::GetDestinationPosition() const
 	return m_vDestinationPosition;
 }
 
+FVector PathEdge::getDirectionToNext() const
+{
+	return m_directionToNext;
+}
+
 EBehaviorType PathEdge::GetBehaviorType() const
 {
 	return m_eBehavior;
@@ -34,4 +39,9 @@ void PathEdge::SetSourcePosition(FVector p_vSourcePosition)
 void PathEdge::SetDestinationPosition(FVector p_vDestinationPosition)
 {
 	m_vDestinationPosition = p_vDestinationPosition;
+}
+
+void PathEdge::setDirectionToNext(FVector t_directionToNext)
+{
+	m_directionToNext = t_directionToNext;
 }
