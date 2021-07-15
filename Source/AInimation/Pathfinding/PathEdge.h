@@ -17,7 +17,8 @@ class AINIMATION_API PathEdge
 {
 	FVector m_vSourcePosition;
 	FVector m_vDestinationPosition;
-	FVector m_directionToNext;
+	FVector m_sourceDirection;
+	FVector m_targetDirection;
 
 	EBehaviorType m_eBehavior;
 
@@ -28,11 +29,13 @@ public:
 	// Getters
 	FVector GetSourcePosition() const;
 	FVector GetDestinationPosition() const;
-	FVector getDirectionToNext() const;
+	FVector getSourceDirection() const;
+	FVector getTargetDirection() const;
 	EBehaviorType GetBehaviorType() const;
 
 	// Setters
 	void SetSourcePosition(FVector p_vSourcePosition);
 	void SetDestinationPosition(FVector p_vDestinationPosition);
-	void setDirectionToNext(FVector t_directionToNext);
+	void setSourceDirection(FVector t_sourceDirection);
+	void setTargetDirection(FVector t_targetDirection);
 };

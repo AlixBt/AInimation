@@ -34,5 +34,9 @@ public:
 	bool EqualDistance(FVector p_vCurrent, FVector p_vToCheck) const;
 	void ShiftPathPoint(FVector& p_vPointToAdd, FVector p_vApexPoint, FVector p_vPointChecked) const;
 	void SmoothPath(TArray<FVector>& p_aRoughPath) const;
-	TArray<PathEdge> ConvertPath(TArray<FVector> p_aPath, FVector t_actorForwardVector) const;
+	TArray<PathEdge> ConvertPath(TArray<FVector> p_aPath) const;
+	void setDirectionToNext(TArray<PathEdge>& t_path, FVector t_actorForwardVector) const;
+
+	TArray<PathEdge> steeringCircles(TArray<PathEdge> t_path, AAIIrex* t_owner) const;
+	TArray<FVector> calculateCircleCenters(PathEdge t_currentEdge, float t_turnRadius) const;
 };

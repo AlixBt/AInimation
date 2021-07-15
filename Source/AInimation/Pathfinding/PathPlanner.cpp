@@ -67,6 +67,7 @@ bool PathPlanner::CreatePathToPosition(FVector p_vTargetPosition, TArray<PathEdg
 	if (!aPathNodes.IsEmpty())
 	{
 		p_aPath = pPathFinder->FunnelAlgorithm(m_pOwner, aPathNodes, vStartPosition, p_vTargetPosition);
+		p_aPath = pPathFinder->steeringCircles(p_aPath, m_pOwner);
 		return true;
 	}
 

@@ -81,7 +81,7 @@ EStatus GoalTraversePath::Process()
 	else*/
 	{
 		// We check if the NPC is at destination with a radius of 50.0f
-		if (m_pOwner->GetNPC()->GetActorLocation().Equals(m_pathEdge.GetDestinationPosition(), 450.0f))
+		if (m_pOwner->GetNPC()->GetActorLocation().Equals(m_pathEdge.GetDestinationPosition(), 200.0f))
 		{
 			if (m_bLastEdgeInPath)
 			{

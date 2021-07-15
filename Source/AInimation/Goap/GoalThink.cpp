@@ -28,14 +28,6 @@ EStatus GoalThink::Process()
 
 	m_eStatus = ProcessSubgoals();
 
-	if (!m_path.IsEmpty())
-	{
-		for (int i = 0; i < m_path.Num(); i++)
-		{
-			DrawDebugLine(m_pOwner->GetWorld(), m_path[i].GetSourcePosition(), m_path[i].GetDestinationPosition(), FColor::Purple, false, -1.0f, 0, 5.0f);
-		}
-	}
-
 	return m_eStatus;
 }
 
@@ -73,8 +65,8 @@ void GoalThink::addGoalExplore()
 	
 	if (!m_pOwner->getIsFollowingPath())
 	{
-		m_pOwner->getPathPlanner()->CreatePathToPosition(worldPoint, m_path);
-		AddSubgoal(new GoalFollowPath(m_pOwner, m_path));
+		m_pOwner->getPathPlanner()->CreatePathToPosition(worldPoint, m_pOwner->path);
+		AddSubgoal(new GoalFollowPath(m_pOwner, m_pOwner->path));
 		UE_LOG(LogTemp, Warning, TEXT("Path found"));
 	}
 }

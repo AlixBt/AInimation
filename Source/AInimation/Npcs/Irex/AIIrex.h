@@ -7,6 +7,7 @@
 #include "../../Utility/CartTarget.h"
 #include "NavigationSystem.h"
 #include "../../Pathfinding/PathPlanner.h"
+#include "../../Pathfinding/PathEdge.h"
 #include "AIIrex.generated.h"
 
 class GoalThink;
@@ -34,7 +35,7 @@ class AINIMATION_API AAIIrex : public AAIController
 
 	// Path following
 	FVector m_targetPosition {FVector::ZeroVector};
-	float m_turnRate {120.0f};
+	float m_turnRadius {500.0f};
 
 public:
 	// Constructor
@@ -54,12 +55,16 @@ public:
 	ACartTarget* getPath() const;
 	bool getIsFollowingPath() const;
 	FVector getTargetPosition() const;
-	float getTurnRate() const;
+	float getTurnRadius() const;
 
 	// Setters
 	void setIsFollowingPath(bool t_bIsFollowingPath);
 	void setTargetPosition(FVector t_targetPosition);
-	void setTurnRate(float t_turnRate);
+	void setTurnRadius(float t_turnRadius);
 
 	void setMovementBehaviors(float t_deltaTime);
+
+	// DEBUG - REMOVE LATER
+	TArray<PathEdge> path;
+	TArray<FVector> circleCenters;
 };

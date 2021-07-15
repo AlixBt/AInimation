@@ -12,7 +12,6 @@ class GoalEvaluator;
 class AINIMATION_API GoalThink : public GoalComposite
 {
 	TArray<GoalEvaluator*> m_goalsEvaluator;
-	TArray<PathEdge> m_path;
 public:
 	GoalThink(AAIIrex* p_pOwner);
 	virtual ~GoalThink();

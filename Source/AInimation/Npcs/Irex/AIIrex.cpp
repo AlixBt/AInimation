@@ -69,7 +69,20 @@ void AAIIrex::Tick(float p_deltaTime)
 			setMovementBehaviors(p_deltaTime);
 			m_brain->arbitrate();			
 			EStatus status = m_brain->Process();
-			//DrawDebugLine(GetWorld(), startPoint, firstControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
+
+			for (int i = 0; i < path.Num(); ++i)
+			{
+				DrawDebugLine(GetWorld(), path[i].GetSourcePosition(), path[i].GetDestinationPosition(), FColor::Green, false, -1.0f, 0, 5.0f);
+				DrawDebugDirectionalArrow(GetWorld(), path[i].GetSourcePosition(), path[i].GetSourcePosition() + path[i].getSourceDirection() * m_npcCharacter->GetCharacterMovement()->MaxWalkSpeed, 500.0f, FColor::Red, false, -1.0f, 1, 5.0f);
+				DrawDebugDirectionalArrow(GetWorld(), path[i].GetDestinationPosition(), path[i].GetDestinationPosition() + path[i].getTargetDirection() * m_npcCharacter->GetCharacterMovement()->MaxWalkSpeed, 500.0f, FColor::Red, false, -1.0f, 1, 5.0f);
+			}
+
+			for (int i = 0; i < circleCenters.Num(); ++i)
+			{
+				DrawDebugBox(GetWorld(), circleCenters[i], FVector(25.0f, 25.0f, 25.0f), FColor::Orange, false, -1.0f, 0, 5.0f);
+				DrawDebugCircle(GetWorld(), circleCenters[i], m_turnRadius, 30, FColor::Magenta, false, -1.0f, 0, 5.0f, FVector(0.f, 1.f, 0.f), FVector(1.f, 0.f, 0.f), false);
+			}
+			//
 			//DrawDebugLine(GetWorld(), endPoint, secondControlPoint, FColor::Green, false, -1.0f, 0, 5.0f);
 			//DrawDebugLine(GetWorld(), lastVectorStartPoint, lastVectorEndPoint, FColor::Green, false, -1.0f, 0, 5.0f);
 
@@ -113,9 +126,9 @@ FVector AAIIrex::getTargetPosition() const
 	return m_targetPosition;
 }
 
-float AAIIrex::getTurnRate() const
+float AAIIrex::getTurnRadius() const
 {
-	return m_turnRate;
+	return m_turnRadius;
 }
 
 void AAIIrex::setIsFollowingPath(bool t_bIsFollowingPath)
@@ -128,9 +141,9 @@ void AAIIrex::setTargetPosition(FVector t_targetPosition)
 	m_targetPosition = t_targetPosition;
 }
 
-void AAIIrex::setTurnRate(float t_turnRate)
+void AAIIrex::setTurnRadius(float t_turnRadius)
 {
-	m_turnRate = t_turnRate;
+	m_turnRadius = t_turnRadius;
 }
 
 void AAIIrex::setMovementBehaviors(float t_deltaTime)
